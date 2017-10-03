@@ -6,7 +6,6 @@ _Repository for code written for 2017 Embedded Systems project_
 These files are designed to compile from the command line provided the correct tools are installed.
 The structure here started from [this repository](https://github.com/wangyeee/STM32F4-FreeRTOS) but
 some stylistic changes have been made (such as changing directory names to lowercase where possible).
-
 Please skim through [Makefile](Makefile) and [main.c](main.c) as they will provide perspective in the sections below.
 
 To get set up on a new machine:
