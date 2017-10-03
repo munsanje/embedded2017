@@ -32,7 +32,7 @@ st-util 1.4.0-6-g7b7a5c1
 Taking note of the port number, `:4242` in this case, navigate to the project root folder in a
 separate terminal then run
 ```
-$ arm-none-eabi-gdb binary/FreeRTOS.elf
+$ arm-none-eabi-gdb binary/ziki.elf
 tar rem :4242
 b main
 continue
