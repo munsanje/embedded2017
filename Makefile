@@ -7,7 +7,7 @@ TOOLCHAIN_PREFIX:=arm-none-eabi
 OPTLVL:=0
 DBG:=-g
 
-FREERTOS:=$(CURDIR)/FreeRTOS
+FREERTOS:=$(CURDIR)/lib/FreeRTOS
 STARTUP:=$(CURDIR)/hardware
 LINKER_SCRIPT:=$(CURDIR)/util/stm32_flash.ld
 

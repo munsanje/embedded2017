@@ -1,8 +1,13 @@
+# IDE / editors 
 .cproject
 .project
 .settings
-
 *.lvimrc
+*.swp
+
+# compiled files
 binary/*
 build/*
+
+
 !.gitignore
