@@ -1,5 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "entry.h"
 
 // Macro to use CCM (Core Coupled Memory) in STM32F4
 #define CCM_RAM __attribute__((section(".ccmram")))
@@ -8,8 +9,6 @@
 
 StackType_t uinputTaskStack[UINPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
-
-void uinput_main(void* p);
 
 int main(void) {
     SystemInit();
@@ -94,12 +93,4 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
     *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
     *ppxTimerTaskStackBuffer = uxTimerTaskStack;
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
-}
-
-void uinput_main(void* p) {
-    for (;;) {
-        vTaskDelay(1000);
-    }
-
-    vTaskDelete(NULL);
 }

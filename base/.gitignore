@@ -1,1 +1,3 @@
-.lvimrc
+*.lvimrc*
+binary/*
+build/*
