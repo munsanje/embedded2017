@@ -18,7 +18,7 @@ INCLUDE+=-I$(CURDIR)/lib/CMSIS/Device/ST/STM32F4xx/Include
 INCLUDE+=-I$(CURDIR)/lib/CMSIS/Include
 INCLUDE+=-I$(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/inc
 INCLUDE+=-I$(CURDIR)/config
-INCLUDE+=-I$(CURDIR)/dev
+INCLUDE+=-I$(CURDIR)/src
 
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
@@ -26,7 +26,7 @@ BIN_DIR = $(CURDIR)/binary
 # vpath is used so object files are written to the build directory instead
 # of the same directory as their source files
 vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
-          $(CURDIR)/dev/ $(CURDIR)/hardware $(FREERTOS) \
+          $(CURDIR)/src/ $(CURDIR)/hardware $(FREERTOS) \
           $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F 
 
 vpath %.s $(STARTUP)
