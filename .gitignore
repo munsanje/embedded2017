@@ -5,3 +5,4 @@
 *.lvimrc
 binary/*
 build/*
+!.gitignore
