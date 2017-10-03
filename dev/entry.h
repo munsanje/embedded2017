@@ -5,4 +5,4 @@
  * reading pots using ADC */
 void uinput_main(void* p);
 
-#endif /* ENTRY POINTS */
+#endif /* ENTRY */
