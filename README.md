@@ -38,3 +38,32 @@ b main
 continue
 ```
 You can use all the commands from last year (like breakpoints, `-tui`) as appropriate.
+
+## Project folder structure
+The project folder is designed to allow for modular construction of FreeRTOS tasks.
+Hence the basic idea is that [main.c](main.c) sets up FreeRTOS, which launches the various
+independent tasks in [src](src/).
+
+The [config](config/) folder contains library files describing the system at a software level, while
+[hardware](hardware/) has the basic assembly necessary to launch into C. Finally [lib](lib/)
+contains external libraries being used, and [util](util/) is for other important files (like the
+linker description).
+
+### Adding a task
+To make a new task, first edit [main.c](main.c), mimicking the code for existing tasks. Add a line
+in [ziki.h](src/ziki.h) with the entry-point for the task, then make the files needed within the
+[src](src/) directory. Ensure that these are added to [Makefile](Makefile).
+
+### Including libraries
+It is worth noting that the project [Makefile](Makefile) was very carefully designed so that library
+files are included as necessary, so you should be able to include header files from anywhere in the
+project folders.
+
+### Binaries
+The other two folders in this directory are [binary](binary/) and [build](build/). The former of
+these contains the output `ziki.elf` file, while the latter contains object files from the build.
+Accordingly, files within these folders are ignored to avoid cluttering the repo.
+
+### Ignored files
+Please add any OS/IDE/editor specific files into an [ignore file](.gitignore) so that only the files
+related to the project are in the repo.
