@@ -5,4 +5,7 @@
  * reading pots using ADC */
 void uinput_main(void* p);
 
+/* Handles LED display */
+void output_main(void* p);
+
 #endif /* ZIKI_H */
