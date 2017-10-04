@@ -71,7 +71,7 @@ void setup_pots() {
     DMA_Init(DMA2_Stream0, &DMA_InitStruct);
     DMA_Cmd(DMA2_Stream0, ENABLE);
 
-    // set ADC1 to read PC0, PC1 and send to DMA1
+    // set ADC1 to read PC0, PC1 and send to DMA2
     ADC_CommonInitStruct.ADC_Mode = ADC_Mode_Independent;
     ADC_CommonInitStruct.ADC_Prescaler = ADC_Prescaler_Div2;
     ADC_CommonInitStruct.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
