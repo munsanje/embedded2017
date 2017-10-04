@@ -10,4 +10,4 @@ binary/*
 build/*
 
 
-!.gitignore
+!*.gitignore
