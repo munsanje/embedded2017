@@ -15,7 +15,7 @@ To get set up on a new machine:
    your machine (I suggest softlink otherwise so we have a consistent Makefile in the repo). 
 
 ## Testing
-To compile the project, simply type `make`; installing on the micro is done with `make flash`.
+To install on the micro run `make flash` after building the source with `make`.
 
 In order to debug with GDB, the procedure is similar to last year. First type `st-util` into a
 terminal, i.e.

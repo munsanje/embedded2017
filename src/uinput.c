@@ -1,6 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "stm32f4xx_adc.h"
+#include "stm32f4xx_dma.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
@@ -8,33 +9,51 @@
 const uint16_t LEDS = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 const uint16_t LED[4] = {GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15};
 
-void adc_init() {
-	ADC_InitTypeDef ADC_init_structure; //Structure for adc confguration
-	GPIO_InitTypeDef GPIO_initStructre; //Structure for analog input pin
-	//Clock configuration
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE); //The ADC1 is connected the APB2 peripheral bus thus we will use its clock source
-	RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOCEN, ENABLE); //Clock for the ADC port!! Do not forget about this one ;)
-	//Analog pin configuration
-	GPIO_StructInit(&GPIO_initStructre);
-	GPIO_initStructre.GPIO_Pin = GPIO_Pin_0; //The channel 10 is connected to PC0
-	GPIO_initStructre.GPIO_Mode = GPIO_Mode_AN; //The PC0 pin is configured in analog mode
-	GPIO_initStructre.GPIO_PuPd = GPIO_PuPd_NOPULL; //We don't need any pull up or pull down
-	GPIO_Init(GPIOC, &GPIO_initStructre); //Affecting the port with the initialization structure configuration
-	//ADC structure configuration
+void setup_adc() {
+    // enable peripherals
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE); // ADC interface clock
+	RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOCEN, ENABLE); // GPIO interface clock for ADC
+
+    // setup GPIO pins for ADC
+	GPIO_InitTypeDef GPIO_InitStructre;
+	GPIO_StructInit(&GPIO_InitStructre);
+	GPIO_InitStructre.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2;
+	GPIO_InitStructre.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStructre.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOC, &GPIO_InitStructre);
+
+    // configure ADC
 	ADC_DeInit();
-	ADC_init_structure.ADC_DataAlign = ADC_DataAlign_Right; //data converted will be shifted to right
-	ADC_init_structure.ADC_Resolution = ADC_Resolution_6b; //Input voltage is converted into a 12bit number giving a maximum value of 4096
-	ADC_init_structure.ADC_ContinuousConvMode = ENABLE; //the conversion is continuous, the input data is converted more than once
-	ADC_init_structure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1; // conversion is synchronous with TIM1 and CC1 (actually I'm not sure about this one :/)
-	ADC_init_structure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None; //no trigger for conversion
-	ADC_init_structure.ADC_NbrOfConversion = 1; //I think this one is clear :p
-	ADC_init_structure.ADC_ScanConvMode = DISABLE; //The scan is configured in one channel
-	ADC_Init(ADC1, &ADC_init_structure); //Initialize ADC with the previous configuration
-	//Enable ADC conversion
-	ADC_Cmd(ADC1, ENABLE);
-	//Select the channel to be read from
+	ADC_InitTypeDef ADC_InitStructure;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_Resolution = ADC_Resolution_6b;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
+	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+	ADC_InitStructure.ADC_NbrOfConversion = 2;
+	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+	ADC_Init(ADC1, &ADC_InitStructure);
+
+    // select channels for conversion
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_144Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_144Cycles);
+    
+    // enable conversion
+    ADC_ContinuousModeCmd(ADC1, ENABLE);
+    ADC_DMACmd(ADC1, ENABLE);
+    ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
+    /*ADC_Cmd(ADC1, ENABLE);*/
 }
+
+void setup_dma() {
+    RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_DMA1, ENABLE);
+
+    DMA_InitTypeDef DMA_InitStruct;
+    DMA_StructInit(&DMA_InitStruct); // default values
+    DMA_InitStruct.DMA_DIR = DMA_DIR_MemoryToMemory;
+}
+
+
 
 uint16_t readADC1() {
     ADC_SoftwareStartConv(ADC1);//Start the conversion
@@ -59,7 +78,7 @@ void uinput_main(void* p) {
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOB,&GPIO_InitStructure);
 
-    adc_init();
+    setup_adc();
 
     uint16_t val = 0;
 
@@ -68,6 +87,7 @@ void uinput_main(void* p) {
     for (;;) {
         val = readADC1();
         x = val/16;
+        y = 3 - x;
 
         GPIOB->ODR = (x << 6) | (y << 4);
         GPIO_ResetBits(GPIOD, LEDS);
