@@ -43,7 +43,6 @@ You can use all the commands from last year (like breakpoints, `-tui`) as approp
 The project folder is designed to allow for modular construction of FreeRTOS tasks.
 Hence the basic idea is that [main.c](main.c) sets up FreeRTOS, which launches the various
 independent tasks in [src](src/).
-
 The [config](config/) folder contains library files describing the system at a software level, while
 [hardware](hardware/) has the basic assembly necessary to launch into C. Finally [lib](lib/)
 contains external libraries being used, and [util](util/) is for other important files (like the
