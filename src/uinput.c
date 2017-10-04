@@ -5,11 +5,6 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
-
-#define ADC1_CHANNEL_PC0 10
-#define ADC1_CHANNEL_PC1 11
-
-
 // stores the values of the pots as updated by the ADC via DMA
 uint8_t Pot[2] = {0,0};
 
@@ -38,6 +33,9 @@ void uinput_main(void* p) {
     }
     vTaskDelete(NULL);
 }
+
+#define ADC1_CHANNEL_PC0 10
+#define ADC1_CHANNEL_PC1 11
 
 void setup_pots() {
     ADC_InitTypeDef       ADC_InitStruct;
@@ -90,8 +88,8 @@ void setup_pots() {
     ADC_InitStruct.ADC_NbrOfConversion = 2;
     ADC_Init(ADC1, &ADC_InitStruct);
 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_144Cycles); // PC0
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_144Cycles); // PC1
+    ADC_RegularChannelConfig(ADC1, ADC1_CHANNEL_PC0, 1, ADC_SampleTime_144Cycles); // PC0
+    ADC_RegularChannelConfig(ADC1, ADC1_CHANNEL_PC1, 2, ADC_SampleTime_144Cycles); // PC1
 
     ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
     ADC_DMACmd(ADC1, ENABLE);
