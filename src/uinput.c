@@ -8,7 +8,7 @@
 // stores the values of the pots as updated by the ADC via DMA
 uint8_t Pot[2] = {0,0};
 
-// configures ADC1 to read PC0, PC1 and fill potX, potY using DMA
+// configures ADC1 to read PC0, PC1 and update Pot array above
 void setup_pots();
 
 void uinput_main(void* p) {
