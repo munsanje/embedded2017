@@ -20,7 +20,7 @@ int main(void) {
     // Create a task
     // Stack and TCB are placed in CCM of STM32F4
     // The CCM block is connected directly to the core, which leads to zero wait states
-    /*xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);*/
+    xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
 
     vTaskStartScheduler();  // should never return
