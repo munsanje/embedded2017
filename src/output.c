@@ -4,25 +4,31 @@
 #include "stm32f4xx_rcc.h"
 
 void render(uint8_t pattern[4][4]);
-void enable_pins();
+
+void configure_pins();
 
 int output_main(void) {
-    enable_pins();
+    configure_pins();
 
     // saved patterns
-    uint8_t Y[4][4] = {{1,0,0,1},{1,0,0,1},{0,1,1,0},{0,1,1,0}};
-    uint8_t O[4][4] = {{0,1,1,0},{1,0,0,1},{1,0,0,1},{0,1,1,0}};
-    uint8_t U[4][4] = {{1,0,0,1},{1,0,0,1},{1,0,0,1},{0,1,1,0}};
-    uint8_t X[4][4] = {{1,0,0,1},{0,1,1,0},{0,1,1,0},{1,0,0,1}};
+    uint8_t b1[4][4] = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+    uint8_t b2[4][4] = {{0,0,0,1},{0,0,1,0},{0,1,0,0},{1,0,0,0}};
+    uint8_t  t[4][4] = {{1,1,1,1},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+    uint8_t  r[4][4] = {{0,0,0,1},{0,0,0,1},{0,0,0,1},{0,0,0,1}};
+    uint8_t  b[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{1,1,1,1}};
+    uint8_t  l[4][4] = {{1,0,0,0},{1,0,0,0},{1,0,0,0},{1,0,0,0}};
 
     while (1) {
-        render(Y);
-        render(O);
-        render(U);
+        render(b1);
+        render(b2);
+        render(t);
+        render(r);
+        render(b);
+        render(l);
     }
 }
 
-void enable_pins() {
+void configure_pins() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
@@ -53,10 +59,9 @@ void render(uint8_t pattern[4][4]) {
     }
 
     // write to LEDs
-    for (uint32_t i = 0; i < 1000000; i++) {
+    for (uint32_t i = 0; i < 100000; i++) {
         for (uint8_t j = 0; j < 4; j++) {
             GPIOA->ODR = row[j];
         }
     }
-
 }

@@ -97,4 +97,3 @@ void setup_pots() {
 
     ADC_SoftwareStartConv(ADC1);
 }
-
