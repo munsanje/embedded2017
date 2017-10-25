@@ -7,12 +7,16 @@
 
 #define UINPUT_TASK_STACK_SIZE 256
 #define OUTPUT_TASK_STACK_SIZE 256
+#define SOUND_TASK_STACK_SIZE 256
 
-StackType_t uinputTaskStack[UINPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
-StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
+StackType_t uinputTaskStack[UINPUT_TASK_STACK_SIZE] CCM_RAM;
+StaticTask_t uinputTaskBuffer CCM_RAM;
 
-StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
-StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
+StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;
+StaticTask_t outputTaskBuffer CCM_RAM;
+
+StackType_t soundTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;
+StaticTask_t soundTaskBuffer CCM_RAM;
 
 int main(void) {
     SystemInit();
@@ -20,8 +24,9 @@ int main(void) {
     // Create a task
     // Stack and TCB are placed in CCM of STM32F4
     // The CCM block is connected directly to the core, which leads to zero wait states
-    xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
+    /*xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);*/
     /*xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);*/
+    xTaskCreateStatic(output_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);
 
     vTaskStartScheduler();  // should never return
 

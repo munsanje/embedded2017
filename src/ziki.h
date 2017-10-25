@@ -8,4 +8,7 @@ void uinput_main(void* p);
 /* Handles LED display */
 void output_main(void* p);
 
+/* Synthesizes Audio */
+void synth_main(void* p);
+
 #endif /* ZIKI_H */
