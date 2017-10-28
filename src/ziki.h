@@ -11,7 +11,4 @@ void visual_main(void* p);
 /* Handles Sound output */
 void sound_main(void* p);
 
-/* Synthesizes Audio */
-void synth_main(void* p);
-
 #endif /* ZIKI_H */
