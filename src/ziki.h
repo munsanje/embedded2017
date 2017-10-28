@@ -3,10 +3,13 @@
 
 /* Handles all tasks related to user-input; for instance
  * reading pots using ADC */
-void uinput_main(void* p);
+void input_main(void* p);
 
 /* Handles LED display */
-void output_main(void* p);
+void visual_main(void* p);
+
+/* Handles Sound output */
+void sound_main(void* p);
 
 /* Synthesizes Audio */
 void synth_main(void* p);
