@@ -61,13 +61,13 @@ int main(void)
   STM_EVAL_LEDInit(LED_BLUE);
   STM_EVAL_LEDInit(LED_ORANGE);
 
-  const char* filename = "shortcartoon.wav";
-  uint32_t buffer_size = get_wav_size(filename);
+  const char* filename = "shortcartoon.wav";  // name of wave file on sd card
+  uint32_t buffer_size = get_wav_size(filename);  // get size of PCM part of wave file
   uint16_t buffer[buffer_size];
-  read_wav_file(filename, buffer, buffer_size);
+  read_wav_file(filename, buffer, buffer_size);  // load in PCM data
   if(buffer != NULL) {
 	  STM_EVAL_LEDOn(LED_GREEN);
-  	  playBuffer(buffer, buffer_size);
+  	  playBuffer(buffer, buffer_size);  // play buffer if successfully read
   }
   STM_EVAL_LEDOn(LED_RED);
 
