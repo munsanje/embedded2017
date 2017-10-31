@@ -2,27 +2,29 @@
 #include "task.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#include "ziki.h"
+
 
 void render(uint8_t pattern[4][4]);
 
 void configure_pins();
 
-int output_main(void) {
+void output_main(void* p) {
     configure_pins();
 
-    // saved patterns
-    uint8_t b1[4][4] = {{1,0,0,0},{1,0,0,0},{1,0,0,0},{1,0,0,0}};
-    uint8_t b2[4][4] = {{0,1,0,0},{0,1,0,0},{0,1,0,0},{0,1,0,0}};
-    uint8_t b3[4][4] = {{0,0,1,0},{0,0,1,0},{0,0,1,0},{0,0,1,0}};
-    uint8_t b4[4][4] = {{0,0,0,1},{0,0,0,1},{0,0,0,1},{0,0,0,1}};
+    uint8_t trial[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
 
+    uint8_t x,y,coords;
 
     while (1) {
-        render(b1);
-        render(b2);
-        render(b3);
-        render(b4);
+        xQueueReceive(Global_Queue_Handle, &coords, 500);
+        x = coords >> 2;
+        y = coords << 2;
+
+        trial[x][y] = 1;
+        render(trial);
     }
+
 }
 
 void configure_pins() {

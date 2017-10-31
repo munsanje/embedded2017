@@ -5,8 +5,8 @@
 // Macro to use CCM (Core Coupled Memory) in STM32F4
 #define CCM_RAM __attribute__((section(".ccmram")))
 
-#define UINPUT_TASK_STACK_SIZE 256
-#define OUTPUT_TASK_STACK_SIZE 256
+#define UINPUT_TASK_STACK_SIZE 1024
+#define OUTPUT_TASK_STACK_SIZE 1024
 
 StackType_t uinputTaskStack[UINPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
@@ -14,17 +14,26 @@ StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
 StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
 
+
+//Global Queue Handle
+
 int main(void) {
     SystemInit();
 
     // Create a task
     // Stack and TCB are placed in CCM of STM32F4
     // The CCM block is connected directly to the core, which leads to zero wait states
+
+    //Establish queue
+    //Global_Queue_Handle = xQueueCreate(10,sizeof(uint8_t));
+
     xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
     vTaskStartScheduler();  // should never return
 
-    for (;;);
+    for (;;){
+
+    }
 }
 
 void vApplicationTickHook(void) {

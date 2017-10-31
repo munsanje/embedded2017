@@ -31,7 +31,6 @@ void uinput_main(void* p) {
         y = Pot[1] >> 4;
         sum = x<<2 + y;
 
-        xQueueSend(Global_Queue_Handle, &sum, 1000);
         //GPIOB->ODR = (x << 6) | (y << 4);
 
     }
