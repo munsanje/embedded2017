@@ -29,11 +29,9 @@ void uinput_main(void* p) {
     for (;;) {
         x = Pot[0] >> 4; // focus on 2 MSb's of 6-bit ADC output
         y = Pot[1] >> 4;
-        sum = x<<2 + y;
 
+        sum = (x<<2) + y;
         xQueueSend(Global_Queue_Handle, &sum, 1000);
-        //GPIOB->ODR = (x << 6) | (y << 4);
-
     }
     vTaskDelete(NULL);
 }

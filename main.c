@@ -1,5 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
+
+#define GLOBALS_DECLS
 #include "ziki.h"
 
 // Macro to use CCM (Core Coupled Memory) in STM32F4
@@ -14,9 +16,6 @@ StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
 StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
 
-
-//Global Queue Handle
-
 int main(void) {
     SystemInit();
 
@@ -24,8 +23,7 @@ int main(void) {
     // Stack and TCB are placed in CCM of STM32F4
     // The CCM block is connected directly to the core, which leads to zero wait states
 
-    //Establish queue
-    //Global_Queue_Handle = xQueueCreate(10,sizeof(uint8_t));
+    Global_Queue_Handle = xQueueCreate(10,sizeof(uint8_t));
 
     xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
