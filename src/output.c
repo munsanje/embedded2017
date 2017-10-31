@@ -18,16 +18,16 @@ void output_main(void* p) {
     uint8_t x,y,coords = 0;
 
     while (1) {
-        xQueueReceive(Global_Queue_Handle, &coords, 1000);
+        xQueueReceive(Global_Queue_Handle, &coords, 2);
         x = coords >> 2;
-        y = 0b11 | coords;
-
+        y = 0b11 & coords;
 
         for (uint8_t i = 0; i < 4; i++) {
             for (uint8_t j = 0; j < 4; j++) {
                 a[i][j] = b[i][j];
             }
         }
+
         a[x][y] = 1;
         render(a);
     }
