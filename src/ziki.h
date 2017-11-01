@@ -12,8 +12,6 @@ void output_main(void* p);
 
 #endif /* ZIKI_H */
 
-
-
 #ifndef GLOBALS_H
 #define GLOBALS_H
 

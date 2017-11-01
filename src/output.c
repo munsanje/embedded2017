@@ -23,17 +23,20 @@ void output_main(void* p) {
         x_global, y_global = 0;
 
         xQueueReceive(Global_Queue_Handle, &coords, 1);
+        xQueueReceive(Global_Queue_Handle, &save, 1);
+
         x = coords >> 2;
         y = 0b11 & coords;
 
+        if(save==1){
+            b[x][y] = ~b[x][y]; //invert
+        }
 
-        
         for (uint8_t i = 0; i < 4; i++) {
             for (uint8_t j = 0; j < 4; j++) {
                 a[i][j] = b[i][j];
             }
         }
-
 
         a[x][y] = 1;
         render(a,coords);
@@ -55,10 +58,10 @@ void configure_pins() {
 
 void render(uint8_t pattern[4][4],uint8_t coords) {
     // multiplexing masks
-
     x_global = coords >> 2;
     y_global = 0b11 & coords;
 
+    //test
     if(count < 2){
         pattern[x_global][y_global] = 0;
         count++;
@@ -89,6 +92,5 @@ void render(uint8_t pattern[4][4],uint8_t coords) {
             GPIOA->ODR = row[j];
         }
     }
-
     count++;
 }

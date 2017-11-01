@@ -6,11 +6,21 @@
 #include "stm32f4xx_rcc.h"
 #include "ziki.h"
 
+#include "stm32f4xx.h"
+#include "stm32f4_discovery.h"
+
+#define button BUTTON_USER
+
 // stores the values of the pots as updated by the ADC via DMA
 uint8_t Pot[2] = {0,0};
 
 // configures ADC1 to read PC0, PC1 and update Pot array above
 void setup_pots();
+
+//Button Config
+STM_EVAL_PBInit( button , BUTTON_MODE_GPIO);
+
+
 
 void uinput_main(void* p) {
     setup_pots();
@@ -26,13 +36,34 @@ void uinput_main(void* p) {
 
     uint8_t x,y,sum = 0;
 
+    //get initial button state
+    uint8_t old_state = STM_EVAL_PBGetState(button);
+    uint8_t new_state;
+    uint8_t count = 1;
+    uint8_t save = 0b0; //whether to save or not
+
     for (;;) {
+        //pot input
         x = Pot[0] >> 4; // focus on 2 MSb's of 6-bit ADC output
         y = Pot[1] >> 4;
-
         sum = (x<<2) + y;
+
+        //button_debounce
+        new_state = STM_EVAL_PBGetState(button);
+        if(new_state != old_state){
+        		if(new_state == 1){
+
+        		}
+        		old_state = new_state;
+
+        		//debounce
+        		delay_ms(20);
+        }
+
         xQueueSend(Global_Queue_Handle, &sum, 1);
+        xQueueSend(Global_Queue_Handle, &save, 1);
     }
+
     vTaskDelete(NULL);
 }
 
