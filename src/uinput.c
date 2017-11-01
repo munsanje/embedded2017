@@ -31,7 +31,7 @@ void uinput_main(void* p) {
         y = Pot[1] >> 4;
 
         sum = (x<<2) + y;
-        xQueueSend(Global_Queue_Handle, &sum, 2);
+        xQueueSend(Global_Queue_Handle, &sum, 1);
     }
     vTaskDelete(NULL);
 }

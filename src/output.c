@@ -5,9 +5,11 @@
 #include "ziki.h"
 
 
-void render(uint8_t pattern[4][4]);
+void render(uint8_t pattern[4][4],uint8_t coords);
 
 void configure_pins();
+
+uint8_t x_global, y_global, count = 0;
 
 void output_main(void* p) {
     configure_pins();
@@ -18,18 +20,23 @@ void output_main(void* p) {
     uint8_t x,y,coords = 0;
 
     while (1) {
-        xQueueReceive(Global_Queue_Handle, &coords, 2);
+        x_global, y_global = 0;
+
+        xQueueReceive(Global_Queue_Handle, &coords, 1);
         x = coords >> 2;
         y = 0b11 & coords;
 
+
+        
         for (uint8_t i = 0; i < 4; i++) {
             for (uint8_t j = 0; j < 4; j++) {
                 a[i][j] = b[i][j];
             }
         }
 
+
         a[x][y] = 1;
-        render(a);
+        render(a,coords);
     }
 
 }
@@ -46,8 +53,20 @@ void configure_pins() {
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
-void render(uint8_t pattern[4][4]) {
+void render(uint8_t pattern[4][4],uint8_t coords) {
     // multiplexing masks
+
+    x_global = coords >> 2;
+    y_global = 0b11 & coords;
+
+    if(count < 2){
+        pattern[x_global][y_global] = 0;
+        count++;
+    }
+    else{
+        count = 0;
+    }
+
     uint8_t row[4] = {
         0b10001111,
         0b01001111,
@@ -70,4 +89,6 @@ void render(uint8_t pattern[4][4]) {
             GPIOA->ODR = row[j];
         }
     }
+
+    count++;
 }
