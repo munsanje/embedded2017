@@ -6,26 +6,28 @@
 // Macro to use CCM (Core Coupled Memory) in STM32F4
 #define CCM_RAM __attribute__((section(".ccmram")))
 
-#define UINPUT_TASK_STACK_SIZE 1024
-#define OUTPUT_TASK_STACK_SIZE 1024
+#define INPUT_TASK_STACK_SIZE 1024
+#define VISUAL_TASK_STACK_SIZE 1024
+#define SOUND_TASK_STACK_SIZE 1024
 
-StackType_t uinputTaskStack[UINPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
-StaticTask_t uinputTaskBuffer CCM_RAM;  // Put TCB in CCM
+StackType_t inputTaskStack[INPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
 
-StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
-StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
+StackType_t visualTaskStack[VISUAL_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+StaticTask_t visualTaskBuffer CCM_RAM;  // Put TCB in CCM
+
+StackType_t soundTaskStack[SOUND_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+StaticTask_t soundTaskBuffer CCM_RAM;  // Put TCB in CCM
 
 int main(void) {
     SystemInit();
 
-    // Create a task
-    // Stack and TCB are placed in CCM of STM32F4
-    // The CCM block is connected directly to the core, which leads to zero wait states
+    Global_Queue_Handle = xQueueCreate(1, sizeof(uint8_t));
 
-    Global_Queue_Handle = xQueueCreate(1,sizeof(uint8_t));
+    xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
+    xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);
+    xTaskCreateStatic(sound_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);
 
-    xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
-    xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
     vTaskStartScheduler();  // should never return
 
     for (;;){
