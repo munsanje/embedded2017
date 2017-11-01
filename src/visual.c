@@ -11,7 +11,7 @@ void render(uint8_t pattern[4][4]);
 
 void configure_pins();
 
-void output_main(void* p) {
+void visual_main(void* p) {
     configure_pins();
 
     uint8_t a[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};

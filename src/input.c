@@ -14,7 +14,7 @@ uint8_t Pot[2] = {0,0};
 // configures ADC1 to read PC0, PC1 and update Pot array above
 void setup_pots();
 
-void uinput_main(void* p) {
+void input_main(void* p) {
     setup_pots();
 
     // configure output pins for LEDs
