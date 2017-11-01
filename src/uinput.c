@@ -1,9 +1,11 @@
-#include "FreeRTOS.h"
-#include "task.h"
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "ziki.h"
 
 // stores the values of the pots as updated by the ADC via DMA

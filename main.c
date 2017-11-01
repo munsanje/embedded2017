@@ -1,7 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define GLOBALS_DECLS
 #include "ziki.h"
 
 // Macro to use CCM (Core Coupled Memory) in STM32F4
