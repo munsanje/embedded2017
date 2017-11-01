@@ -51,28 +51,32 @@ SOFTWARE.
 **
 **===========================================================================
 */
-
+FATFS FatFs;
+FIL fp;
 int main(void)
 {
 //
-  SystemInit();
-  STM_EVAL_LEDInit(LED_GREEN);
-  STM_EVAL_LEDInit(LED_RED);
-  STM_EVAL_LEDInit(LED_BLUE);
-  STM_EVAL_LEDInit(LED_ORANGE);
+	SystemInit();
+	STM_EVAL_LEDInit(LED_GREEN);
+	STM_EVAL_LEDInit(LED_RED);
+	STM_EVAL_LEDInit(LED_BLUE);
+	STM_EVAL_LEDInit(LED_ORANGE);
 
-  const char* filename = "shortcartoon.wav";  // name of wave file on sd card
-  uint32_t buffer_size = get_wav_size(filename);  // get size of PCM part of wave file
-  uint16_t buffer[buffer_size];
-  read_wav_file(filename, buffer, buffer_size);  // load in PCM data
-  if(buffer != NULL) {
-	  STM_EVAL_LEDOn(LED_GREEN);
-  	  playBuffer(buffer, buffer_size);  // play buffer if successfully read
-  }
-  STM_EVAL_LEDOn(LED_RED);
+	FRESULT res = init_sd(&FatFs);
+	const char* filename = "cartoon012.wav";
+	uint32_t buffer_size = get_wav_size(&fp, filename);
+	uint16_t buffer[buffer_size];
+    res = read_wav_file(&fp, filename, buffer, buffer_size);  // load in PCM data
+	if(res == FR_OK) {
+		STM_EVAL_LEDOn(LED_GREEN);
+		playBuffer(buffer, buffer_size);
+		STM_EVAL_LEDOff(LED_GREEN);
+	}
+	deinit_sd();
+    STM_EVAL_LEDOn(LED_RED);
 
-  /* Infinite loop */
-  while (1) {}
+	/* Infinite loop */
+	while (1) {}
 }
 
 /*

@@ -14,9 +14,26 @@
 #define LED_BLUE LED6
 
 // private variables
-FIL fp;
-FATFS FatFs;
 
+static uint8_t mount_state = 0;  // 1 means successfully mounted card, 0 means unsuccessful
+
+FRESULT init_sd(FATFS *FatFs) {
+	FRESULT res = FR_OK;
+	if(mount_state == 0) {
+		FRESULT res = f_mount(FatFs, "", 1);
+		mount_state = res == FR_OK ? 1 : 0;
+	}
+	return res;
+}
+
+FRESULT deinit_sd() {
+	FRESULT res = FR_OK;
+	if(mount_state == 1) {
+		res = f_mount(0, "", 1);
+		mount_state = res == FR_OK ? 0 : 1;
+	}
+	return res;
+}
 
 /** Read the header of a wav file into memory
  * @see wave_header
@@ -24,14 +41,13 @@ FATFS FatFs;
  * @param filename name of file on SD card
  * @param header pointer to struct in which to store header information
  * @return res result of operation*/
-FRESULT read_wav_header(const TCHAR* filename, wave_header* header) {
-
-	FRESULT res = f_open(&fp, filename, FA_READ);
+FRESULT read_wav_header(FIL *fp, const TCHAR* filename, wave_header* header) {
+	FRESULT res = f_open(fp, filename, FA_READ);
 	if(res == FR_OK) {
 		uint16_t bytes_read = 0;
-		res = f_read(&fp, header, 44, &bytes_read);
-		f_close(&fp);
+		res = f_read(fp, header, 44, &bytes_read);
 	}
+	f_close(fp);
 	return res;
 }
 
@@ -44,14 +60,14 @@ FRESULT read_wav_header(const TCHAR* filename, wave_header* header) {
  * @return res result of operation
  * */
 
-FRESULT read_wav_data(const TCHAR* filename, wave_header* header, uint16_t* buffer, uint32_t buffer_size) {
-	FRESULT res = f_open(&fp, filename, FA_READ);
+FRESULT read_wav_data(FIL *fp, const TCHAR* filename, wave_header* header, uint16_t* buffer, uint32_t buffer_size) {
+	FRESULT res = f_open(fp, filename, FA_READ);
 	if(res == FR_OK) {
 		uint16_t bytes_read = 44;  // file offset
-		f_lseek(&fp, bytes_read);  // seek to file offset of 44 bytes to beginning of data portion
-		res = f_read(&fp, buffer, buffer_size * (header->BitsPerSample/8), &bytes_read);
-		f_close(&fp);
+		f_lseek(fp, bytes_read);  // seek to file offset of 44 bytes to beginning of data portion
+		res = f_read(fp, buffer, buffer_size * (header->BitsPerSample/8), &bytes_read);
 	}
+	f_close(fp);
 	return res;
 }
 
@@ -62,15 +78,14 @@ FRESULT read_wav_data(const TCHAR* filename, wave_header* header, uint16_t* buff
  * @param wav_data pointer to array containing PCM data
  * @return res result of operation
  * */
-FRESULT write_wav_file(const TCHAR* filename, wave_header* header, uint16_t* wav_data) {
-//	FIL fp;
-	FRESULT res = f_open(&fp, filename, FA_WRITE | FA_CREATE_ALWAYS);
+FRESULT write_wav_file(FIL *fp, const TCHAR* filename, wave_header* header, uint16_t* wav_data) {
+	FRESULT res = f_open(fp, filename, FA_WRITE | FA_CREATE_ALWAYS);
 	if(res == FR_OK) {
 		uint16_t bytes_written = 0;
-		f_write(&fp, header, 44, &bytes_written);
-		res = f_write(&fp, wav_data, header->Subchunk2Size, &bytes_written);
-		f_close(&fp);
+		f_write(fp, header, 44, &bytes_written);
+		res = f_write(fp, wav_data, header->Subchunk2Size, &bytes_written);
 	}
+	f_close(fp);
 	return res;
 }
 
@@ -79,36 +94,31 @@ FRESULT write_wav_file(const TCHAR* filename, wave_header* header, uint16_t* wav
  * @param filename name of wave file on sd card
  * @return size of data portion of file
  * */
-uint32_t get_wav_size(const TCHAR* filename) {
-	FRESULT res = f_mount(&FatFs, "", 1);
+uint32_t get_wav_size(FIL *fp, const TCHAR* filename) {
 	uint32_t size = 0;
-	if(res == FR_OK) {
-		wave_header header;
-		read_wav_header(filename, &header);
+	wave_header header;
+	FRESULT res = read_wav_header(fp, filename, &header);
+	if(res == FR_OK)
 		size = header.Subchunk2Size / (header.BitsPerSample / 8);
-	}
-	f_mount(0, "", 1);
+
 	return size;  // return 0 if failed to read header of wav file
 }
 
 /** Mount sd card and read wave file specified
  * @param filename name of file on sd card*/
-FRESULT read_wav_file(const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
-	FRESULT res = f_mount(&FatFs, "", 1);
-	if(res == FR_OK) {
-		STM_EVAL_LEDOn(LED_BLUE);
-		// get header
-		wave_header header;
-		read_wav_header(filename, &header);
-		// get PCM
-		uint16_t it;
-		for(it = 0; it < buffer_size; it++) buffer[it] = 0; // zero out buffer
-		read_wav_data(filename, &header, buffer, buffer_size);
-		// unmount
-		res = f_mount(0, "", 1);
-		if(res == FR_OK)
-			STM_EVAL_LEDOff(LED_BLUE);
-	}
+FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
+	STM_EVAL_LEDOn(LED_BLUE);
+	// get header
+	wave_header header;
+	read_wav_header(fp, filename, &header);
+	// get PCM
+	uint16_t it;
+	for(it = 0; it < buffer_size; it++) buffer[it] = 0; // zero out buffer
+	FRESULT res = read_wav_data(fp, filename, &header, buffer, buffer_size);
+	// unmount
+	if(res == FR_OK)
+		STM_EVAL_LEDOff(LED_BLUE);
+
 	return res;
 
 
