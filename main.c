@@ -5,9 +5,9 @@
 // Macro to use CCM (Core Coupled Memory) in STM32F4
 #define CCM_RAM __attribute__((section(".ccmram")))
 
-#define INPUT_TASK_STACK_SIZE 256
-#define VISUAL_TASK_STACK_SIZE 256
-#define SOUND_TASK_STACK_SIZE 256
+#define INPUT_TASK_STACK_SIZE 1024
+#define VISUAL_TASK_STACK_SIZE 1024
+#define SOUND_TASK_STACK_SIZE 1024
 
 StackType_t inputTaskStack[INPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
