@@ -1,0 +1,6 @@
+sound.c:25:6:initAudio	8	static
+sound.c:46:6:playBuffer	32	static
+sound.c:82:10:amplitudeTodB	24	static
+sound.c:86:10:dBToamplitude	24	static
+sound.c:90:7:updateFilter	32	static
+sound.c:112:6:initFilter	24	static

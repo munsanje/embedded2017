@@ -1,0 +1,4 @@
+codec.c:10:6:codec_init	48	static
+codec.c:94:6:codec_ctrl_init	24	static
+codec.c:177:6:send_codec_ctrl	24	static
+codec.c:213:9:read_codec_register	24	static
