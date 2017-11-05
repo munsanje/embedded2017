@@ -7,44 +7,40 @@
 #include "ziki.h"
 
 
-void render(uint8_t pattern[4][4],uint8_t coords);
+#define LED_OFF 0
+#define LED_ON 1
+#define LED_CURSOR 2
+
+#define LED_FREQ 6
+
+uint8_t CURSOR_COUNT = 0;
+
+void render(uint8_t pattern[4][4]);
 
 void configure_pins();
-
-uint8_t x_global, y_global, count = 0;
 
 void visual_main(void* p) {
     configure_pins();
 
-    uint8_t a[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-    uint8_t b[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+    uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};
+    uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};
 
-    uint8_t x,y,coords,save = 0;
+    uint8_t x, y, coords;
 
-    uint8_t count2 = 0;
     while (1) {
-        x_global, y_global = 0;
-
         xQueueReceive(Global_Queue_Handle, &coords, 1);
-        //xQueueReceive(Global_Queue_Handle, &save, 1);
 
         x = coords >> 2;
         y = 0b11 & coords;
 
-        /*
-        if(save == 1){
-              a[x][y] = ~b[x][y];
-        }
-        */
-        b[x][y] = 1;
         for (uint8_t i = 0; i < 4; i++) {
             for (uint8_t j = 0; j < 4; j++) {
-                a[i][j] = b[i][j];
+                show[i][j] = selected[i][j];
             }
         }
+        show[x][y] = LED_CURSOR;
 
-        a[x][y] = 1;
-        render(a,coords);
+        render(show);
     }
 }
 
@@ -60,20 +56,18 @@ void configure_pins() {
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
-void render(uint8_t pattern[4][4],uint8_t coords) {
-    // multiplexing masks
-    x_global = coords >> 2;
-    y_global = 0b11 & coords;
+void render(uint8_t pattern[4][4]) {
+    // increment count appropriately
+    CURSOR_COUNT = (CURSOR_COUNT + 1) % (LED_FREQ + 1);
 
-    //test
-    if(count < 2){
-        pattern[x_global][y_global] = 0;
-        count++;
+    // determine cursors
+    for (uint8_t i = 0; i < 4; i++) {
+        for (uint8_t j = 0; j < 4; j++) {
+            if (pattern[i][j] == LED_CURSOR) {
+                pattern[i][j] = (CURSOR_COUNT > LED_FREQ/2);
+            }
+        }
     }
-    else{
-        count = 0;
-    }
-
 
     uint8_t row[4] = {
         0b10001111,
@@ -97,5 +91,4 @@ void render(uint8_t pattern[4][4],uint8_t coords) {
             GPIOA->ODR = row[j];
         }
     }
-    count++;
 }
