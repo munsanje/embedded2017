@@ -11,6 +11,8 @@ void render(uint8_t pattern[4][4],uint8_t coords);
 
 void configure_pins();
 
+uint8_t x_global, y_global, count = 0;
+
 void visual_main(void* p) {
     configure_pins();
 
