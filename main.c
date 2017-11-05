@@ -23,7 +23,7 @@ int main(void) {
     // Stack and TCB are placed in CCM of STM32F4
     // The CCM block is connected directly to the core, which leads to zero wait states
 
-    Global_Queue_Handle = xQueueCreate(2,sizeof(uint8_t));
+    Global_Queue_Handle = xQueueCreate(3,sizeof(uint8_t));
 
     xTaskCreateStatic(uinput_main, "UserInput", UINPUT_TASK_STACK_SIZE, NULL, 1, uinputTaskStack, &uinputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);

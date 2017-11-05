@@ -16,11 +16,9 @@ uint8_t Pot[2] = {0,0};
 
 // configures ADC1 to read PC0, PC1 and update Pot array above
 void setup_pots();
+void delay_ms();
 
 //Button Config
-STM_EVAL_PBInit( button , BUTTON_MODE_GPIO);
-
-
 
 void uinput_main(void* p) {
     setup_pots();
@@ -34,13 +32,7 @@ void uinput_main(void* p) {
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    uint8_t x,y,sum = 0;
-
-    //get initial button state
-    uint8_t old_state = STM_EVAL_PBGetState(button);
-    uint8_t new_state;
-    uint8_t count = 1;
-    uint8_t save = 0b0; //whether to save or not
+    uint8_t x,y,sum,save = 0;
 
     for (;;) {
         //pot input
@@ -48,20 +40,9 @@ void uinput_main(void* p) {
         y = Pot[1] >> 4;
         sum = (x<<2) + y;
 
-        //button_debounce
-        new_state = STM_EVAL_PBGetState(button);
-        if(new_state != old_state){
-        		if(new_state == 1){
-
-        		}
-        		old_state = new_state;
-
-        		//debounce
-        		delay_ms(20);
-        }
-
-        xQueueSend(Global_Queue_Handle, &sum, 1);
-        xQueueSend(Global_Queue_Handle, &save, 1);
+        save=0;
+        xQueueSend(Global_Queue_Handle, &sum, 2);
+        //xQueueSendToBack(Global_Queue_Handle, &save, 2);
     }
 
     vTaskDelete(NULL);
@@ -129,4 +110,10 @@ void setup_pots() {
     ADC_Cmd(ADC1, ENABLE);
 
     ADC_SoftwareStartConv(ADC1);
+}
+
+void delay_ms(uint32_t milli)
+{
+	uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
+	for(; delay != 0; delay--);
 }
