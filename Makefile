@@ -36,8 +36,9 @@ ASRC=startup_stm32f4xx.s
 SRC+=stm32f4xx_it.c
 SRC+=system_stm32f4xx.c
 SRC+=main.c
-SRC+=uinput.c
-SRC+=output.c
+SRC+=visual.c
+SRC+=input.c
+SRC+=sound.c
 
 # FreeRTOS Source Files
 SRC+=port.c

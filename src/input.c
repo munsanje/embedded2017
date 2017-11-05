@@ -1,9 +1,11 @@
-#include "FreeRTOS.h"
-#include "task.h"
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "ziki.h"
 
 #include "stm32f4xx.h"
@@ -20,7 +22,7 @@ void delay_ms();
 
 //Button Config
 
-void uinput_main(void* p) {
+void input_main(void* p) {
     setup_pots();
 
     // configure output pins for LEDs
@@ -38,9 +40,8 @@ void uinput_main(void* p) {
         //pot input
         x = Pot[0] >> 4; // focus on 2 MSb's of 6-bit ADC output
         y = Pot[1] >> 4;
-        sum = (x<<2) + y;
 
-        save=0;
+        sum = (x << 2) + y;
         xQueueSend(Global_Queue_Handle, &sum, 2);
         //xQueueSendToBack(Global_Queue_Handle, &save, 2);
     }

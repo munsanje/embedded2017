@@ -1,7 +1,9 @@
-#include "FreeRTOS.h"
-#include "task.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "ziki.h"
 
 
@@ -9,9 +11,7 @@ void render(uint8_t pattern[4][4],uint8_t coords);
 
 void configure_pins();
 
-uint8_t x_global, y_global, count = 0;
-
-void output_main(void* p) {
+void visual_main(void* p) {
     configure_pins();
 
     uint8_t a[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
