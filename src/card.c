@@ -12,8 +12,8 @@
 void card_main(void* p) {
 	FATFS FatFs;
 	FIL fp;
-	int count =0;
-	SystemInit();
+    int count = 0;
+
 	FRESULT res = init_sd(&FatFs);  // initialize SD card
 	const char* filename = "pG.wav"; //mA.wav";
 	const char* files[] = {"pG.wav","mCh.wav"};
@@ -26,16 +26,20 @@ void card_main(void* p) {
 		res = open_file(&fp, files[i], FA_READ | FA_OPEN_ALWAYS);
 			int k = 0; //
 		res = read_wav_file(&fp, files[i], buffer, 11025);
+		if(res == FR_OK) {
+        }
 		for(int k=0;k<11025;k++){
 			bufferP[k]=bufferP[k]+buffer[k];
 		}
 
-	}
-	deinit_sd();  // de-initialize SD card
 
+	}
+
+	deinit_sd();  // de-initialize SD card
 	playBuffer(bufferP, 11025);
 
     for (;;) {
     }
     vTaskDelete(NULL);
+
 }
