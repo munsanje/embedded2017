@@ -19,6 +19,16 @@ INCLUDE+=-I$(CURDIR)/lib/CMSIS/Include
 INCLUDE+=-I$(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/inc
 INCLUDE+=-I$(CURDIR)/config
 INCLUDE+=-I$(CURDIR)/src
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_delay
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_gpio
+INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_spi
+INCLUDE+=-I$(CURDIR)/src/card
+
+
 
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
@@ -27,7 +37,11 @@ BIN_DIR = $(CURDIR)/binary
 # of the same directory as their source files
 vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
           $(CURDIR)/src/ $(CURDIR)/hardware $(FREERTOS) \
-          $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F
+          $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
+		  $(CURDIR)/lib/tm_stm32f4_delay $(CURDIR)/lib/tm_stm32f4_gpio \
+		  $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers \
+		  $(CURDIR)/lib/tm_stm32f4_fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option \
+		  $(CURDIR)/lib/tm_stm32f4_spi
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
@@ -39,6 +53,7 @@ SRC+=main.c
 SRC+=visual.c
 SRC+=input.c
 SRC+=sound.c
+SRC+=card.c
 
 # FreeRTOS Source Files
 SRC+=port.c
@@ -48,6 +63,20 @@ SRC+=tasks.c
 SRC+=event_groups.c
 SRC+=timers.c
 SRC+=heap_4.c
+
+# TM libraries
+SRC+=tm_stm32f4_delay.c
+SRC+=tm_stm32f4_timer_properties.c
+SRC+=tm_stm32f4_fatfs.c
+SRC+=diskio.c
+SRC+=ff.c
+SRC+=fatfs_sd.c
+SRC+=fatfs_sd_sdio.c
+SRC+=ccsbcs.c
+SRC+=syscall.c
+SRC+=unicode.c
+SRC+=tm_stm32f4_gpio.c
+SRC+=tm_stm32f4_spi.c
 
 # Standard Peripheral Source Files
 SRC+=misc.c
@@ -105,7 +134,7 @@ MCUFLAGS=-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-pre
 COMMONFLAGS=-O$(OPTLVL) $(DBG) -Wall -ffunction-sections -fdata-sections
 CFLAGS=$(COMMONFLAGS) $(MCUFLAGS) $(INCLUDE) $(CDEFS)
 
-LDLIBS=-lm -lc -lgcc
+LDLIBS=-lm -lc -lgcc -lnosys
 LDFLAGS=$(MCUFLAGS) -u _scanf_float -u _printf_float -fno-exceptions -Wl,--gc-sections,-T$(LINKER_SCRIPT),-Map,$(BIN_DIR)/$(TARGET).map
 
 CC=$(TOOLCHAIN_PATH)/$(TOOLCHAIN_PREFIX)-gcc
