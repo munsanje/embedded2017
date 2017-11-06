@@ -18,7 +18,6 @@ INCLUDE+=-I$(CURDIR)/lib/CMSIS/Device/ST/STM32F4xx/Include
 INCLUDE+=-I$(CURDIR)/lib/CMSIS/Include
 INCLUDE+=-I$(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/inc
 INCLUDE+=-I$(CURDIR)/config
-INCLUDE+=-I$(CURDIR)/src
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_delay
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs
@@ -26,9 +25,8 @@ INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_gpio
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_spi
+INCLUDE+=-I$(CURDIR)/src
 INCLUDE+=-I$(CURDIR)/src/card
-
-
 
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
@@ -36,7 +34,7 @@ BIN_DIR = $(CURDIR)/binary
 # vpath is used so object files are written to the build directory instead
 # of the same directory as their source files
 vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
-          $(CURDIR)/src/ $(CURDIR)/hardware $(FREERTOS) \
+          $(CURDIR)/src $(CURDIR)/src/card $(CURDIR)/hardware $(FREERTOS) \
           $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
 		  $(CURDIR)/lib/tm_stm32f4_delay $(CURDIR)/lib/tm_stm32f4_gpio \
 		  $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers \
@@ -52,8 +50,12 @@ SRC+=system_stm32f4xx.c
 SRC+=main.c
 SRC+=visual.c
 SRC+=input.c
-SRC+=sound.c
 SRC+=card.c
+
+# Card Source files
+SRC+=codec.c
+SRC+=sound.c
+SRC+=wav.c
 
 # FreeRTOS Source Files
 SRC+=port.c
