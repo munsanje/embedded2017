@@ -9,6 +9,7 @@
 #define INPUT_TASK_STACK_SIZE 1024
 #define VISUAL_TASK_STACK_SIZE 1024
 #define SOUND_TASK_STACK_SIZE 1024
+#define CARD_TASK_STACK_SIZE 1024
 
 StackType_t inputTaskStack[INPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
@@ -19,14 +20,18 @@ StaticTask_t visualTaskBuffer CCM_RAM;  // Put TCB in CCM
 StackType_t soundTaskStack[SOUND_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t soundTaskBuffer CCM_RAM;  // Put TCB in CCM
 
+StackType_t cardTaskStack[CARD_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+StaticTask_t cardTaskBuffer CCM_RAM;  // Put TCB in CCM
+
 int main(void) {
     SystemInit();
 
     Global_Queue_Handle = xQueueCreate(1, sizeof(uint8_t));
 
-    xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
-    xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);
-    xTaskCreateStatic(sound_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);
+    /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
+    /*xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);*/
+    /*xTaskCreateStatic(sound_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);*/
+    xTaskCreateStatic(card_main, "Card", CARD_TASK_STACK_SIZE, NULL, 1, cardTaskStack, &cardTaskBuffer);
 
     vTaskStartScheduler();  // should never return
 
