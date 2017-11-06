@@ -65,6 +65,7 @@ int main(void)
 	FRESULT res = init_sd(&FatFs);  // initialize SD card
 	const char* filename = "mA.wav";
 	uint32_t buffer_size = get_wav_size(&fp, filename);
+	uint8_t i = 0;  // DO NOT REMOVE: useless statement to avoid NOP-type bug
 	uint16_t buffer[buffer_size];
     res = read_wav_file(&fp, filename, buffer, buffer_size);  // load in PCM data
 	if(res == FR_OK) {
