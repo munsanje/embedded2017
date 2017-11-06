@@ -25,13 +25,20 @@ void visual_main(void* p) {
     uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};
     uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};
 
-    uint8_t x, y, coords;
+    uint8_t x, y, input, coords, save;
 
     while (1) {
-        xQueueReceive(Global_Queue_Handle, &coords, 1);
+        xQueueReceive(Global_Queue_Handle, &input, 1);
 
+
+        coords = 0b1111 & input;
         x = coords >> 2;
         y = 0b11 & coords;
+
+        save = (0b10000 & input) >> 4;
+        if (save) {
+            selected[x][y] = ~selected[x][y];
+        }
 
         for (uint8_t i = 0; i < 4; i++) {
             for (uint8_t j = 0; j < 4; j++) {
