@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "stm32f4xx.h"
-#include "stm32f4_discovery.h"
 
 // local modules
 #include "ff.h"

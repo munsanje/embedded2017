@@ -8,11 +8,6 @@
 // local modules
 #include "wav.h"
 
-#define LED_ORANGE LED3
-#define LED_GREEN LED4
-#define LED_RED LED5
-#define LED_BLUE LED6
-
 // private variables
 
 static uint8_t mount_state = 0;  // 1 means successfully mounted card, 0 means unsuccessful
@@ -148,7 +143,6 @@ uint32_t get_wav_size(FIL *fp, const TCHAR* filename) {
 /** Mount sd card and read wave file specified
  * @param filename name of file on sd card*/
 FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
-	STM_EVAL_LEDOn(LED_BLUE);
 	// get header
 	wave_header header;
 	read_wav_header(fp, filename, &header);
@@ -156,9 +150,6 @@ FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t
 	uint16_t it;
 	for(it = 0; it < buffer_size; it++) buffer[it] = 0; // zero out buffer
 	FRESULT res = read_wav_data(fp, filename, &header, buffer, buffer_size);
-	// unmount
-	if(res == FR_OK)
-		STM_EVAL_LEDOff(LED_BLUE);
 
 	return res;
 
