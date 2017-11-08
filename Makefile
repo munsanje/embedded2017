@@ -28,6 +28,8 @@ INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_spi
 INCLUDE+=-I$(CURDIR)/src
 INCLUDE+=-I$(CURDIR)/src/card
 
+INCLUDE+=-I$(CURDIR)/lib/STM32F4-Discovery
+
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
 
@@ -39,10 +41,15 @@ vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
 		  $(CURDIR)/lib/tm_stm32f4_delay $(CURDIR)/lib/tm_stm32f4_gpio \
 		  $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers \
 		  $(CURDIR)/lib/tm_stm32f4_fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option \
-		  $(CURDIR)/lib/tm_stm32f4_spi
+		  $(CURDIR)/lib/tm_stm32f4_spi \
+			$(CURDIR)/lib/STM32F4-Discovery
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
+
+SRC+=stm32f4_discovery_audio_codec.c
+SRC+=stm32f4_discovery_lis302dl.c
+SRC+=stm32f4_discovery.c
 
 # Project Source Files
 SRC+=stm32f4xx_it.c

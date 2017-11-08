@@ -9,14 +9,17 @@
 #include "sound.h"
 #include "wav.h"
 
-static FATFS FatFs;
-static FIL fp;
+static uint16_t buffer[11025];
+static uint16_t buffer_size = 11025;
+
 void card_main(void* p) {
+
+	static FATFS FatFs;
+	static FIL fp;
+
 	FRESULT res = init_sd(&FatFs);  // initialize SD card
 	const char* filename = "mA.wav";
-	uint32_t buffer_size = get_wav_size(&fp, filename);
-	uint16_t buffer[100];
-    res = read_wav_file(&fp, filename, buffer, 100);  // load in PCM data
+  res = read_wav_file(&fp, filename, buffer, buffer_size);  // load in PCM data
 	if(res == FR_OK) {
 		playBuffer(buffer, buffer_size);
 	}

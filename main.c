@@ -3,11 +3,82 @@
 
 #include "ziki.h"
 
+// #include "stm32f4xx.h"
+// #include "stm32f4_discovery.h"
+// #include <stdio.h>
+// #include <string.h>
+//
+// #include "ff.h"
+// #include "sound.h"
+// #include "wav.h"
+
+
 // Macro to use CCM (Core Coupled Memory) in STM32F4
 #define CCM_RAM __attribute__((section(".ccmram")))
 
-#define CARD_TASK_STACK_SIZE 14000
+// #define INPUT_TASK_STACK_SIZE 1024
+// #define VISUAL_TASK_STACK_SIZE 1024
+// #define SOUND_TASK_STACK_SIZE 1024
 
+// StackType_t inputTaskStack[INPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+// StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
+//
+// StackType_t visualTaskStack[VISUAL_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+// StaticTask_t visualTaskBuffer CCM_RAM;  // Put TCB in CCM
+//
+// StackType_t soundTaskStack[SOUND_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
+// StaticTask_t soundTaskBuffer CCM_RAM;  // Put TCB in CCM
+
+
+// #define LED_ORANGE LED3
+// #define LED_GREEN LED4
+// #define LED_RED LED5
+// #define LED_BLUE LED6
+// static FATFS FatFs;
+// static FIL fp;
+// int main(void)
+// {
+// //
+// 	SystemInit();
+// 	STM_EVAL_LEDInit(LED_GREEN);
+// 	STM_EVAL_LEDInit(LED_RED);
+// 	STM_EVAL_LEDInit(LED_BLUE);
+// 	STM_EVAL_LEDInit(LED_ORANGE);
+//
+// 	FRESULT res = init_sd(&FatFs);  // initialize SD card
+// 	const char* filename = "mCh.wav";
+// 	uint32_t buffer_size = get_wav_size(&fp, filename);
+// 	uint16_t buffer[buffer_size];
+//     res = read_wav_file(&fp, filename, buffer, buffer_size);  // load in PCM data
+// 	if(res == FR_OK) {
+// 		STM_EVAL_LEDOn(LED_GREEN);
+// 		playBuffer(buffer, buffer_size);
+// 		STM_EVAL_LEDOff(LED_GREEN);
+// 	}
+// 	deinit_sd();  // de-initialize SD card
+//     STM_EVAL_LEDOn(LED_RED);
+//
+// 	/* Infinite loop */
+// 	while (1) {}
+// }
+
+// int main(void) {
+//   SystemInit();
+//
+//     Global_Queue_Handle = xQueueCreate(1, sizeof(uint8_t));
+//
+//     xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
+//     xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);
+//     xTaskCreateStatic(sound_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);
+//
+//     vTaskStartScheduler();  // should never return
+//
+//     for (;;){
+//
+//     }
+// }
+
+#define CARD_TASK_STACK_SIZE 1000
 StackType_t cardTaskStack[CARD_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t cardTaskBuffer CCM_RAM;  // Put TCB in CCM
 
