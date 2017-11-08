@@ -33,7 +33,7 @@ void input_main(void* p) {
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    uint8_t x,y,sum,save = 0;
+    uint8_t x = 0, y = 0, sum = 0;
 
     for (;;) {
         //pot input
@@ -41,7 +41,7 @@ void input_main(void* p) {
         y = Pot[1] >> 4;
 
         sum = (x << 2) + y;
-        xQueueSend(Q_HANDLE_INPUT_VISUAL, &sum, 2);
+        xQueueSend(Q_HANDLE_INPUT_OUTPUT, &sum, 2);
     }
 
     vTaskDelete(NULL);

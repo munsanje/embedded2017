@@ -19,7 +19,7 @@ void render(uint8_t pattern[4][4]);
 
 void configure_pins();
 
-void visual_main(void* p) {
+void output_main(void* p) {
     configure_pins();
 
     uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};
@@ -28,7 +28,7 @@ void visual_main(void* p) {
     uint8_t x, y, coords;
 
     while (1) {
-        xQueueReceive(Q_HANDLE_INPUT_VISUAL, &coords, 1);
+        xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
 
         x = coords >> 2;
         y = 0b11 & coords;
