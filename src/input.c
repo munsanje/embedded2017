@@ -41,8 +41,7 @@ void input_main(void* p) {
         y = Pot[1] >> 4;
 
         sum = (x << 2) + y;
-        xQueueSend(Global_Queue_Handle, &sum, 2);
-        //xQueueSendToBack(Global_Queue_Handle, &save, 2);
+        xQueueSend(Q_HANDLE_INPUT_VISUAL, &sum, 2);
     }
 
     vTaskDelete(NULL);

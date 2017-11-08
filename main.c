@@ -22,7 +22,7 @@ StaticTask_t soundTaskBuffer CCM_RAM;  // Put TCB in CCM
 int main(void) {
     SystemInit();
 
-    Global_Queue_Handle = xQueueCreate(1, sizeof(uint8_t));
+    Q_HANDLE_INPUT_VISUAL = xQueueCreate(1, sizeof(uint8_t));
 
     /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
     /*xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);*/

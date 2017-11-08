@@ -28,7 +28,7 @@ void visual_main(void* p) {
     uint8_t x, y, coords;
 
     while (1) {
-        xQueueReceive(Global_Queue_Handle, &coords, 1);
+        xQueueReceive(Q_HANDLE_INPUT_VISUAL, &coords, 1);
 
         x = coords >> 2;
         y = 0b11 & coords;

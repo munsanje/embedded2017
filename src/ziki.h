@@ -3,7 +3,8 @@
 #ifndef ZIKI_H
 #define ZIKI_H
 
-xQueueHandle Global_Queue_Handle;
+xQueueHandle Q_HANDLE_INPUT_VISUAL;
+xQueueHandle Q_HANDLE_VISUAL_SOUND;
 
 /* Handles all tasks related to user-input; for instance
  * reading pots using ADC */

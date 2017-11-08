@@ -7,8 +7,6 @@
 #include "codec.h"
 #include "piano.h"
 
-#define DOWNSCALE 8
-
 void setup_pins();
 
 void play(uint8_t pattern[8][8]);
@@ -47,7 +45,7 @@ void play(uint8_t pattern[8][8]) {
                 if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
                     wave = 0;
                     for (uint8_t k = 0; k < COL_SIZE; k++) {
-                        wave += (piano[k][i]/DOWNSCALE) * pattern[k][j];
+                        wave += (piano[k][i]/8) * pattern[k][j];
                     }
 
                     i++;
