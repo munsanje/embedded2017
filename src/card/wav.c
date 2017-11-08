@@ -146,16 +146,12 @@ FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t
 	// get header
 	wave_header header;
 	read_wav_header(fp, filename, &header);
-	// get PCM
-	uint16_t it;
-	for(it = 0; it < buffer_size; it++) buffer[it] = 0; // zero out buffer
+	for (uint16_t i = 0; i < buffer_size; i++) {
+        buffer[i] = 0; // zero out buffer
+    }
 	FRESULT res = read_wav_data(fp, filename, &header, buffer, buffer_size);
 
 	return res;
 
 
 }
-
-
-
-
