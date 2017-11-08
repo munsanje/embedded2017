@@ -7,7 +7,11 @@
 #include "codec.h"
 #include "piano.h"
 
+#define DOWNSCALE 8
+
 void setup_pins();
+
+void play(uint8_t pattern[8][8]);
 
 void sound_main(void* p) {
     setup_pins();
@@ -28,8 +32,10 @@ void sound_main(void* p) {
         {0,0,0,0,0,0,0,1},
     };
 
-    uint8_t downscale = 4;
+    play(selected);
+}
 
+void play(uint8_t pattern[8][8]) {
     uint8_t sampleCounter = 0;
 	uint16_t i = 0, j = 0;
 	uint16_t sawWave = 0;
@@ -43,7 +49,7 @@ void sound_main(void* p) {
                 if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
                     sawWave = 0;
                     for (uint8_t k = 0; k < COL_SIZE; k++) {
-                        sawWave += (piano[k][i]/downscale) * selected[k][j];
+                        sawWave += (piano[k][i]/DOWNSCALE) * pattern[k][j];
                     }
 
                     i++;
