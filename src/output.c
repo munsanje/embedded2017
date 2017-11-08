@@ -6,6 +6,9 @@
 
 #include "ziki.h"
 
+#include "codec.h"
+#include "piano.h"
+
 
 #define LED_OFF 0
 #define LED_ON 1
@@ -17,26 +20,27 @@ uint8_t CURSOR_COUNT = 0;
 
 void render(uint8_t pattern[9][8]);
 
-void configure_pins();
+void play(uint8_t pattern[8][8]);
+
+void setup_leds();
+void setup_sound();
 
 void output_main(void* p) {
-    configure_pins();
+    setup_leds();
+    setup_sound();
 
-    uint8_t selected[9][8] = {
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1},
+    uint8_t selected[8][8] = {
+        {1,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0},
+        {0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,1,0},
+        {0,0,0,0,0,0,0,1},
     };
-    /*uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};*/
 
     /*uint8_t x, y, input, coords, save;*/
-
     while (1) {
         /*xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);*/
 
@@ -56,12 +60,54 @@ void output_main(void* p) {
         /*}*/
         /*show[x][y] = LED_CURSOR;*/
 
-        render(selected);
+        /*render(selected);*/
     }
 
 }
 
-void configure_pins() {
+ 
+void render(uint8_t pattern[9][8]) {
+    for (uint32_t cnt = 0; cnt < 100000; cnt++) {
+        for (uint8_t i = 0; i < 8; i++) {
+            GPIOA->ODR = 1 << i;
+            uint16_t sub = 0x1FF; // holds E7->E15
+            for (uint8_t j = 0; j < 9; j++) {
+                sub ^= (pattern[j][i] << j);
+            }
+            GPIOE->ODR = sub << 7;
+        }
+    }
+}
+
+void play(uint8_t pattern[8][8]) {
+    uint8_t count = 0;
+	uint16_t i = 0, j = 0, wave = 0;
+	
+	for (; j < COL_SIZE;) {
+		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
+            SPI_I2S_SendData(CODEC_I2S, wave);
+
+            // only update on every second sample to insure that L & R ch. have the same sample value
+            if (count & 1) {
+                if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
+                    wave = 0;
+                    for (uint8_t k = 0; k < COL_SIZE; k++) {
+                        wave += (piano[k][i]/8) * pattern[k][j];
+                    }
+
+                    i++;
+                } else {
+                    i = 0;
+                    j++;
+                }
+
+            }
+            count++;
+        }
+	}
+}
+
+void setup_leds() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOE, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -78,16 +124,22 @@ void configure_pins() {
                                 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
- 
-void render(uint8_t pattern[9][8]) {
-    for (uint32_t cnt = 0; cnt < 100000; cnt++) {
-        for (uint8_t i = 0; i < 8; i++) {
-            GPIOA->ODR = 1 << i;
-            uint16_t sub = 0x1FF; // holds E7->E15
-            for (uint8_t j = 0; j < 9; j++) {
-                sub ^= (pattern[j][i] << j);
-            }
-            GPIOE->ODR = sub << 7;
-        }
-    }
+void setup_sound() {
+    GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+
+	codec_init();
+	codec_ctrl_init();
+	I2S_Cmd(CODEC_I2S, ENABLE);
+
+
 }

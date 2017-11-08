@@ -37,9 +37,8 @@ ASRC=startup_stm32f4xx.s
 SRC+=stm32f4xx_it.c
 SRC+=system_stm32f4xx.c
 SRC+=main.c
-SRC+=visual.c
+SRC+=output.c
 SRC+=input.c
-SRC+=sound.c
 
 # Sound source files
 SRC+=codec.c

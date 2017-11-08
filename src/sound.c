@@ -1,5 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #include "ziki.h"
 
 #include "codec.h"
@@ -28,18 +29,33 @@ void sound_main(void* p) {
         {0,0,0,0,0,0,0,1},
     };
 
+    uint8_t selected_pack[8] = {0};
+    for (uint8_t i = 0; i < 8; i++) {
+        for (uint8_t j = 0; j < 8; j++) {
+            selected_pack[i] += selected[i][j] << j;
+        }
+    }
+
+    uint8_t show[8][8] = {0};
+
+    // unpack
+    for (uint8_t i = 0; i < 8; i++) {
+        for (uint8_t j = 0; j < 8; j++) {
+            show[i][j] = (selected_pack[i] >> j) & 1;
+        }
+    }
 
     while(1) {
-        xQueueReceive(Q_HANDLE_OUTPUT_SOUND, &selected, 1);
-
         play(selected);
     }
 
+    vTaskDelete(NULL);
 }
 
 void play(uint8_t pattern[8][8]) {
     uint8_t count = 0;
 	uint16_t i = 0, j = 0, wave = 0;
+	
 	for (; j < COL_SIZE;) {
 		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
             SPI_I2S_SendData(CODEC_I2S, wave);
@@ -63,8 +79,6 @@ void play(uint8_t pattern[8][8]) {
         }
 
 	}
-
-    vTaskDelete(NULL);
 }
 
 void setup_pins() {
