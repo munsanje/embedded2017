@@ -24,8 +24,8 @@ int main(void) {
 
     Global_Queue_Handle = xQueueCreate(1, sizeof(uint8_t));
 
-    xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
-    xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);
+    /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
+    /*xTaskCreateStatic(visual_main, "Visual", VISUAL_TASK_STACK_SIZE, NULL, 2, visualTaskStack, &visualTaskBuffer);*/
     xTaskCreateStatic(sound_main, "Sound", SOUND_TASK_STACK_SIZE, NULL, 1, soundTaskStack, &soundTaskBuffer);
 
     vTaskStartScheduler();  // should never return
