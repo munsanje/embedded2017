@@ -5,24 +5,25 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "codec.h"
-#include "pA.h"
-
-
-typedef struct {
-	float tabs[8];
-	float params[8];
-	uint8_t currIndex;
-} fir_8;
-
-volatile uint32_t sampleCounter = 0;
-volatile int16_t sample = 0;
-
-float sawWave = 0.0;
-float filteredSaw = 0.0;
-
-void initFilter(fir_8* theFilter);
+#include "piano.h"
 
 void setup_pins();
+
+#define COL_SIZE 4
+#define PIANO_SIZE 11025
+
+uint16_t v1[]={
+	1,0,0,0
+};
+uint16_t v2[]={
+	0,1,0,0
+};
+uint16_t v3[]={
+	0,0,1,0
+};
+uint16_t v4[]={
+	0,0,0,1
+};
 
 void sound_main(void* p) {
     setup_pins();
@@ -32,30 +33,34 @@ void sound_main(void* p) {
 
 	I2S_Cmd(CODEC_I2S, ENABLE);
 
-    fir_8 filt;
-	initFilter(&filt);
+    uint8_t downscale = 4;
 
+    uint8_t sampleCounter = 0;
+	uint16_t i = 0, j = 0;
+	uint16_t sawWave = 0;
+	for (;;) {
+		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
+            SPI_I2S_SendData(CODEC_I2S, sawWave);
 
-    for (int i = 0;;) {
-        if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
-            SPI_I2S_SendData(CODEC_I2S, sample);
+            // only update on every second sample to insure that L & R ch. have the same sample value
+            if (sampleCounter & 0x00000001) {
 
-                // only update on every second sample to insure that L & R ch. have the same sample value
-                if (sampleCounter & 0x00000001)
-                {
-                    if (i<35564){
-                        sawWave= gen[i];
-                        i++;
-                    } else {
-                        i = 0;
+                if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
+                    sawWave = (pA[i]/downscale)*v1[j]+(pG[i]/downscale)*v2[j]+(pB[i]/downscale)*v3[j]+(pF[i]/downscale)*v4[j];
+                    i++;
+                } else {
+                    i = 0;
+                    j++;
+                    if (j >= 4){
+                        j=0;
                     }
-                    sample = (sawWave);
                 }
-                sampleCounter++;
+
             }
+            sampleCounter++;
+        }
 
-
-    }
+	}
 
     vTaskDelete(NULL);
 }
@@ -72,24 +77,4 @@ void setup_pins() {
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-}
-
-void initFilter(fir_8* theFilter)
-{
-	uint8_t i;
-
-	theFilter->currIndex = 0;
-
-	for (i = 0; i < 8; i++) {
-		theFilter->tabs[i] = 0.0;
-    }
-
-	theFilter->params[0] = 0.01;
-	theFilter->params[1] = 0.05;
-	theFilter->params[2] = 0.12;
-	theFilter->params[3] = 0.32;
-	theFilter->params[4] = 0.32;
-	theFilter->params[5] = 0.12;
-	theFilter->params[6] = 0.05;
-	theFilter->params[7] = 0.01;
 }
