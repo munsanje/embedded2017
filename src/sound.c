@@ -12,18 +12,6 @@ void setup_pins();
 #define COL_SIZE 4
 #define PIANO_SIZE 11025
 
-uint16_t v1[]={
-	1,0,0,0
-};
-uint16_t v2[]={
-	0,1,0,0
-};
-uint16_t v3[]={
-	0,0,1,0
-};
-uint16_t v4[]={
-	0,0,0,1
-};
 
 void sound_main(void* p) {
     setup_pins();
@@ -32,6 +20,13 @@ void sound_main(void* p) {
 	codec_ctrl_init();
 
 	I2S_Cmd(CODEC_I2S, ENABLE);
+
+    uint16_t selection[4][4] = {
+       {1,0,0,0},
+       {0,1,0,0},
+       {0,0,1,0},
+       {0,0,0,1}
+    };
 
     uint8_t downscale = 4;
 
@@ -46,7 +41,10 @@ void sound_main(void* p) {
             if (sampleCounter & 0x00000001) {
 
                 if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
-                    sawWave = (pA[i]/downscale)*v1[j]+(pG[i]/downscale)*v2[j]+(pB[i]/downscale)*v3[j]+(pF[i]/downscale)*v4[j];
+                    sawWave = (pA[i]/downscale) * selection[0][j]
+                            + (pB[i]/downscale) * selection[1][j]
+                            + (pC[i]/downscale) * selection[2][j]
+                            + (pD[i]/downscale) * selection[3][j];
                     i++;
                 } else {
                     i = 0;
