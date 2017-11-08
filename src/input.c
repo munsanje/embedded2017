@@ -42,7 +42,6 @@ void input_main(void* p) {
 
         sum = (x << 3) + y;
         xQueueSend(Global_Queue_Handle, &sum, 2);
-        //xQueueSendToBack(Global_Queue_Handle, &save, 2);
     }
 
     vTaskDelete(NULL);
