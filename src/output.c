@@ -15,80 +15,79 @@
 
 uint8_t CURSOR_COUNT = 0;
 
-void render(uint8_t pattern[4][4]);
+void render(uint8_t pattern[9][8]);
 
 void configure_pins();
 
 void output_main(void* p) {
     configure_pins();
 
-    uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};
-    uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};
+    uint8_t selected[9][8] = {
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
+    };
+    /*uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};*/
 
-    uint8_t x, y, coords;
+    /*uint8_t x, y, input, coords, save;*/
 
     while (1) {
-        xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
+        /*xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);*/
 
-        x = coords >> 2;
-        y = 0b11 & coords;
+        /*coords = 0b1111 & input;*/
+        /*x = coords >> 2;*/
+        /*y = 0b11 & coords;*/
 
-        for (uint8_t i = 0; i < 4; i++) {
-            for (uint8_t j = 0; j < 4; j++) {
-                show[i][j] = selected[i][j];
-            }
-        }
-        show[x][y] = LED_CURSOR;
+        /*save = (0b10000 & input) >> 4;*/
+        /*if (save) {*/
+            /*selected[x][y] = ~selected[x][y];*/
+        /*}*/
 
-        render(show);
+        /*for (uint8_t i = 0; i < 4; i++) {*/
+            /*for (uint8_t j = 0; j < 4; j++) {*/
+                /*show[i][j] = selected[i][j];*/
+            /*}*/
+        /*}*/
+        /*show[x][y] = LED_CURSOR;*/
+
+        render(selected);
     }
+
 }
 
 void configure_pins() {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOE, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
-                                | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
+                                | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_7 |  GPIO_Pin_8 |  GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11
+                                | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
-
-void render(uint8_t pattern[4][4]) {
-    // increment count appropriately
-    CURSOR_COUNT = (CURSOR_COUNT + 1) % (LED_FREQ + 1);
-
-    // determine cursors
-    for (uint8_t i = 0; i < 4; i++) {
-        for (uint8_t j = 0; j < 4; j++) {
-            if (pattern[i][j] == LED_CURSOR) {
-                pattern[i][j] = (CURSOR_COUNT > LED_FREQ/2);
+ 
+void render(uint8_t pattern[9][8]) {
+    for (uint32_t cnt = 0; cnt < 100000; cnt++) {
+        for (uint8_t i = 0; i < 8; i++) {
+            GPIOA->ODR = 1 << i;
+            uint16_t sub = 0x1FF; // holds E7->E15
+            for (uint8_t j = 0; j < 9; j++) {
+                sub ^= (pattern[j][i] << j);
             }
-        }
-    }
-
-    uint8_t row[4] = {
-        0b10001111,
-        0b01001111,
-        0b00101111,
-        0b00011111
-    };
-
-    // compute rows
-    for (uint8_t i = 0; i < 4; i++) {
-        uint8_t col = 0;
-        for (uint8_t j = 0; j < 4; j++) {
-            col += (pattern[j][i] << (3-j));
-        }
-        row[i] ^= col;
-    }
-
-    // write to LEDs
-    for (uint32_t i = 0; i < 100000; i++) {
-        for (uint8_t j = 0; j < 4; j++) {
-            GPIOA->ODR = row[j];
+            GPIOE->ODR = sub << 7;
         }
     }
 }
