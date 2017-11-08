@@ -23,6 +23,7 @@ int main(void) {
     SystemInit();
 
     Q_HANDLE_INPUT_OUTPUT = xQueueCreate(1, sizeof(uint8_t));
+    Q_HANDLE_OUTPUT_SOUND = xQueueCreate(1, sizeof(uint8_t)*64);
 
     /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
     /*xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 2, outputTaskStack, &outputTaskBuffer);*/

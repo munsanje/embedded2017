@@ -1,9 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "ziki.h"
 
-#include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
 #include "codec.h"
 #include "piano.h"
 
@@ -30,7 +28,13 @@ void sound_main(void* p) {
         {0,0,0,0,0,0,0,1},
     };
 
-    play(selected);
+
+    while(1) {
+        xQueueReceive(Q_HANDLE_OUTPUT_SOUND, &selected, 1);
+
+        play(selected);
+    }
+
 }
 
 void play(uint8_t pattern[8][8]) {
