@@ -21,8 +21,6 @@ void sound_main(void* p) {
 
 	I2S_Cmd(CODEC_I2S, ENABLE);
 
-
-
     uint8_t selected[8][8] = {
         {1,0,0,0,0,0,0,0},
         {0,1,0,0,0,0,0,0},
@@ -38,33 +36,28 @@ void sound_main(void* p) {
 }
 
 void play(uint8_t pattern[8][8]) {
-    uint8_t sampleCounter = 0;
-	uint16_t i = 0, j = 0;
-	uint16_t sawWave = 0;
+    uint8_t count = 0;
+	uint16_t i = 0, j = 0, wave = 0;
 	for (; j < COL_SIZE;) {
 		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
-            SPI_I2S_SendData(CODEC_I2S, sawWave);
+            SPI_I2S_SendData(CODEC_I2S, wave);
 
             // only update on every second sample to insure that L & R ch. have the same sample value
-            if (sampleCounter & 0x00000001) {
-
+            if (count & 1) {
                 if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
-                    sawWave = 0;
+                    wave = 0;
                     for (uint8_t k = 0; k < COL_SIZE; k++) {
-                        sawWave += (piano[k][i]/DOWNSCALE) * pattern[k][j];
+                        wave += (piano[k][i]/DOWNSCALE) * pattern[k][j];
                     }
 
                     i++;
                 } else {
                     i = 0;
                     j++;
-                    if (j>= COL_SIZE) {
-                        j=0;
-                    }
                 }
 
             }
-            sampleCounter++;
+            count++;
         }
 
 	}
