@@ -19,48 +19,69 @@ void render(uint8_t pattern[4][4]);
 
 void configure_pins();
 
+void write_gpio_vdd(uint8_t bits);
+void write_gpio_gnd(uint16_t bits);
+
 void visual_main(void* p) {
     configure_pins();
 
-    uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};
-    uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};
+    /*uint8_t selected[4][4] = {{1,0,0,1},{0,0,0,0},{0,0,1,0},{0,0,0,0}};*/
+    /*uint8_t show[4][4] = {{1,0,0,0},{1,0,0,0},{0,0,0,0},{0,0,0,0}};*/
 
-    uint8_t x, y, input, coords, save;
+    /*uint8_t x, y, input, coords, save;*/
 
-    while (1) {
-        xQueueReceive(Global_Queue_Handle, &input, 1);
+    /*while (1) {*/
+        /*xQueueReceive(Global_Queue_Handle, &input, 1);*/
 
 
-        coords = 0b1111 & input;
-        x = coords >> 2;
-        y = 0b11 & coords;
+        /*coords = 0b1111 & input;*/
+        /*x = coords >> 2;*/
+        /*y = 0b11 & coords;*/
 
-        save = (0b10000 & input) >> 4;
-        if (save) {
-            selected[x][y] = ~selected[x][y];
-        }
+        /*save = (0b10000 & input) >> 4;*/
+        /*if (save) {*/
+            /*selected[x][y] = ~selected[x][y];*/
+        /*}*/
 
-        for (uint8_t i = 0; i < 4; i++) {
-            for (uint8_t j = 0; j < 4; j++) {
-                show[i][j] = selected[i][j];
-            }
-        }
-        show[x][y] = LED_CURSOR;
+        /*for (uint8_t i = 0; i < 4; i++) {*/
+            /*for (uint8_t j = 0; j < 4; j++) {*/
+                /*show[i][j] = selected[i][j];*/
+            /*}*/
+        /*}*/
+        /*show[x][y] = LED_CURSOR;*/
 
-        render(show);
-    }
+        /*render(show);*/
+    /*}*/
+    GPIOB->ODR = 0b1010100000000000;
+    GPIOD->ODR = 0b0000000000000000;
+    GPIOE->ODR = 0b1010101010000000;
 }
 
+
+void write_gpio_vdd(uint8_t bits) {
+}
+
+void write_gpio_gnd(uint16_t bits);
+
 void configure_pins() {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
-                                | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12
+                                | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_10;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_7 |  GPIO_Pin_8 |  GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11
+                                | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
 
 void render(uint8_t pattern[4][4]) {
