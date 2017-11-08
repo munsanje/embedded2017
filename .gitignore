@@ -1,2 +1,10 @@
 *.TMP
 *.ini
+*.o
+*.xml
+.project
+*.
+*.prefs
+*.cproject
+*.elf*
+button/Debug card/Debug
