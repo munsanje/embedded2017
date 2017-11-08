@@ -23,29 +23,49 @@ void configure_pins();
 void visual_main(void* p) {
     configure_pins();
 
-    uint8_t selected[9][8] = {{0,0,1,1,1,1,0,0},
-                               {0,1,0,0,0,0,1,0},
-                               {1,0,0,1,1,0,0,1},
-                               {1,0,1,0,0,1,0,1},
-                               {1,0,1,0,0,1,0,1},
-                               {1,0,1,0,0,1,0,1},
-                               {1,0,0,1,1,0,0,1},
-                               {0,1,0,0,0,0,1,0},
-                               {0,0,1,1,1,1,0,0}};
+    uint8_t selected[9][8] = {{0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0}};
+
+    uint8_t show[9][8] =     {{0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,0,0,0,0,0}};
 
     while (1) {
-        xQueueReceive(Global_Queue_Handle, &coords, 1);
-        x = coords >> 2;
-        y = 0b11 & coords;
+        uint8_t x, y, input, coords, save;
+        xQueueReceive(Global_Queue_Handle, &input, 1);
+        coords = 0b111111 & input;
+        x = coords >> 3;
+        y = 0b111 & coords;
+
+        /*
+        save = (0b1000000 & input) >> 6;
+        if (save) {
+            selected[x][y] = ~selected[x][y];
+        }
+        */
         
-        for (uint8_t i = 0; i < 4; i++) {
-            for (uint8_t j = 0; j < 4; j++) {
+        //clear show
+        for (uint8_t i = 0; i < 8; i++) {
+            for (uint8_t j = 0; j < 9; j++) {
                 show[i][j] = selected[i][j];
             }
         }
-        show[x][y] = LED_CURSOR;
 
-        render(selected);
+        show[x][y] = 1;
+        render(show);
     }
 }
 
@@ -67,39 +87,6 @@ void configure_pins() {
 
 void render(uint16_t pattern[9][8]) {
     //multitplex
-
-    //GPIOA->ODR = 0b11110000;
-    //GPIOE->ODR = 0b1010101010000000;
-
-    /*
-    for (uint32_t cnt = 0; cnt < 100000; cnt++) {
-            for (uint8_t i = 0; i < 8; i++) {
-                GPIOA->ODR = 1 << i;
-                uint16_t sub = 0x1FF; // holds E7->E15
-                for (uint8_t j = 0; j < 9; j++) {
-                    sub ^= (pattern[j][i] << j);
-                }
-                GPIOE->ODR = sub << 7;
-            }
-    }
-    */
-
-
-
-    /*
-    uint8_t vcc[8] = {0b10000000,
-                      0b01000000,
-                      0b00100000,
-                      0b00010000,
-                      0b00001000,
-                      0b00000100,
-                      0b00000010,
-                      0b00000001};
-  */
-    //GPIOA->ODR = 0b10000000;
-    //GPIOE->ODR = 0b0000100000000000;
-
-    //multitplex
     for(uint8_t i=0; i<8 ; i++){
         GPIOA->ODR = 1<<(7-i);
         GPIOE->ODR = prev_Gnd[i];
@@ -117,17 +104,4 @@ void render(uint16_t pattern[9][8]) {
         }
         prev_Gnd[i] = col_sum;
     }
-
-    /*
-    for(uint16_t loop ; loop <500 ; loop++){
-        for(uint8_t i=0 ; i<8 ; i++){
-            GPIOA->ODR = 0b1 << (7-i));
-            uint16_t col_sum = 0x1FF; // holds E7->E15
-            for(uint8_t j=0 ; j<9 ; i++){
-                col_sum ^= (pattern[j][i] << j);
-            }
-            GPIOE->ODR = col_sum << 7;
-        }
-    }
-    */
 }

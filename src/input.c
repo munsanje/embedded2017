@@ -33,14 +33,14 @@ void input_main(void* p) {
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    uint8_t x,y,sum,save = 0;
+    uint8_t instrumentSel, tempo, playback, save, x, y, sum = 0;
 
     for (;;) {
-        //pot input
+        //pot inputgit
         x = Pot[0] >> 3; // focus on 3 MSb's of 6-bit ADC output
         y = Pot[1] >> 3;
 
-        sum = (x << 2) + y;
+        sum = (x << 3) + y;
         xQueueSend(Global_Queue_Handle, &sum, 2);
         //xQueueSendToBack(Global_Queue_Handle, &save, 2);
     }
