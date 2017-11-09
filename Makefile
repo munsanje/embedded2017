@@ -21,6 +21,8 @@ INCLUDE+=-I$(CURDIR)/config
 INCLUDE+=-I$(CURDIR)/src
 INCLUDE+=-I$(CURDIR)/src/sound
 
+INCLUDE+=-I$(CURDIR)/src/buttons
+
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
 
@@ -28,7 +30,8 @@ BIN_DIR = $(CURDIR)/binary
 # of the same directory as their source files
 vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
           $(CURDIR)/src $(CURDIR)/src/sound  $(CURDIR)/hardware $(FREERTOS) \
-          $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F
+          $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
+		  $(CURDIR)/src/buttons
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
@@ -39,6 +42,7 @@ SRC+=system_stm32f4xx.c
 SRC+=main.c
 SRC+=output.c
 SRC+=input.c
+SRC+=buttons.c
 
 # Sound source files
 SRC+=codec.c
