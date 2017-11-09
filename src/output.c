@@ -150,7 +150,7 @@ void intro_animation(){
                 sweep[y][x-shift] = pattern_ZIKI[y][x];
             }
         }
-        render(sweep);
+        for(uint16_t i = 0 ; i < 3 ; i++){render(sweep);}
         shift++;
     }
 }
