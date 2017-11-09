@@ -23,7 +23,7 @@ void codec_init()
 	PinInitStruct.GPIO_OType = GPIO_OType_PP;
 	PinInitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOB, ENABLE);
 
 	GPIO_Init(GPIOD, &PinInitStruct);
 
@@ -45,14 +45,11 @@ void codec_init()
 
 	// I2S pins
 	PinInitStruct.GPIO_OType = GPIO_OType_PP;
-	PinInitStruct.GPIO_Pin = I2S3_SCLK_PIN | I2S3_SD_PIN | I2S3_MCLK_PIN;
+	PinInitStruct.GPIO_Pin = I2S3_SCLK_PIN | I2S3_SD_PIN | I2S3_MCLK_PIN | I2S3_WS_PIN;
 	GPIO_Init(GPIOC, &PinInitStruct);
 
-	PinInitStruct.GPIO_Pin = I2S3_WS_PIN;
-	GPIO_Init(GPIOA, &PinInitStruct);
-
 	//prepare output ports for alternate function
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_SPI3);
+	GPIO_PinAFConfig(GPIOC, GPIO_PinSource4, GPIO_AF_SPI3);
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_SPI3);
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_SPI3);
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SPI3);
