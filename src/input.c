@@ -10,6 +10,8 @@
 
 #include "stm32f4xx.h"
 
+#include "buttons.h"
+
 #define button BUTTON_USER
 
 // stores the values of the pots as updated by the ADC via DMA
@@ -23,25 +25,25 @@ void delay_ms();
 
 void input_main(void* p) {
     setup_pots();
+    button_type pb_instrument, pb_tempo, pb_playback, pb_save;
+    PBInit("E0", &pb_instrument);
+    PBInit("E1", &pb_tempo);
+    PBInit("E2", &pb_playback);
+    PBInit("E4", &pb_save);
 
-    // configure output pins for LEDs
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    uint8_t instrumentSel, tempo, playback, save, x, y, sum = 0;
-
+    uint8_t instrumentSel, tempo, playback, save, x, y = 0;
+    uint16_t input_snd = 0;
     for (;;) {
-        //pot inputgit
+        //pot input
+        instrumentSel = (uint8_t) PBGetState(&pb_instrument);
+        tempo = (uint8_t) PBGetState(&pb_tempo);
+        playback = (uint8_t) PBGetState(&pb_playback);
+        save = (uint8_t) PBGetState(&pb_save);
         x = Pot[0] >> 3; // focus on 3 MSb's of 6-bit ADC output
         y = Pot[1] >> 3;
 
-        sum = (x << 3) + y;
-        xQueueSend(Global_Queue_Handle, &sum, 2);
+        input_snd = (instrumentSel<<9)+(tempo<<8)+(playback<<7)+(save<<6)+(x << 3) + y;
+        xQueueSend(Global_Queue_Handle, &input_snd, 2);
     }
 
     vTaskDelete(NULL);

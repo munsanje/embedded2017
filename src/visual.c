@@ -6,7 +6,6 @@
 
 #include "ziki.h"
 
-
 #define LED_OFF 0
 #define LED_ON 1
 #define LED_CURSOR 2
@@ -27,13 +26,13 @@ void visual_main(void* p) {
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
+                              {0,0,0,1,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
+                              {0,0,0,1,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0}};
 
-    uint8_t show[9][8] =     {{0,0,0,0,0,0,0,0},
+    uint8_t show[9][8] =     {{1,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0},
@@ -44,28 +43,7 @@ void visual_main(void* p) {
                               {0,0,0,0,0,0,0,0}};
 
     while (1) {
-        uint8_t x, y, input, coords, save;
-        xQueueReceive(Global_Queue_Handle, &input, 1);
-        coords = 0b111111 & input;
-        x = coords >> 3;
-        y = 0b111 & coords;
-
-        /*
-        save = (0b1000000 & input) >> 6;
-        if (save) {
-            selected[x][y] = ~selected[x][y];
-        }
-        */
-        
-        //clear show
-        for (uint8_t i = 0; i < 8; i++) {
-            for (uint8_t j = 0; j < 9; j++) {
-                show[i][j] = selected[i][j];
-            }
-        }
-
-        show[x][y] = 1;
-        render(show);
+        render(selected);
     }
 }
 
