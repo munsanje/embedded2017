@@ -40,13 +40,17 @@ void output_main(void* p) {
     uint8_t save;
     uint8_t prevSave;
 
-    uint8_t pattern[8][8] = {0};
-    for (uint8_t i = 0; i < 8; i++) {
-      pattern[i][i] = 1;
-    }
+    uint8_t pattern[8][8] = {
+        {1,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0},
+        {0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,1,0},
+        {0,0,0,0,0,0,0,1},
+    };
     play(pattern);
-
-    setup_leds();
 
     while (1) {
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);

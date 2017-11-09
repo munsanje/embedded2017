@@ -39,7 +39,7 @@ void codec_init()
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_I2C1);
 
 	//enable I2S and I2C clocks
-	//RCC_I2SCLKConfig(RCC_I2S2CLKSource_PLLI2S);
+    /*RCC_I2SCLKConfig(RCC_I2S2CLKSource_PLLI2S);*/
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1 | RCC_APB1Periph_SPI3, ENABLE);
 	RCC_PLLI2SCmd(ENABLE);
 
