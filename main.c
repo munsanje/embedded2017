@@ -15,6 +15,9 @@ StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
 StackType_t outputTaskStack[OUTPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
 
+TaskHandle_t userInputHandle;
+TaskHandle_t outputHandle;
+
 int main(void) {
     SystemInit();
 
