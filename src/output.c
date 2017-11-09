@@ -63,9 +63,9 @@ void output_main(void* p) {
 }
 
 void play(uint8_t pattern[8][8]) {
-    uint8_t count = 0;
-	uint16_t i = 0, j = 0, wave = 0;
-	
+  uint8_t count = 0;
+  uint16_t i = 0, j = 0, wave = 0;
+
 	for (; j < COL_SIZE;) {
 		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
             SPI_I2S_SendData(CODEC_I2S, wave);
