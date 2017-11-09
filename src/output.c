@@ -29,6 +29,8 @@ void intro_animation();
 void setup_leds();
 void setup_sound();
 
+
+
 void output_main(void* p) {
     setup_leds();
     setup_sound();
@@ -47,9 +49,9 @@ void output_main(void* p) {
     }
     play(pattern);
 */
+
     intro_animation();
     while (1) {
-        intro_animation();
 
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
         x = 7-(coords >> 3);
