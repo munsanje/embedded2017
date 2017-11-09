@@ -50,7 +50,6 @@ void output_main(void* p) {
         {0,0,0,0,0,0,1,0},
         {0,0,0,0,0,0,0,1},
     };
-    play(pattern);
 
     while (1) {
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
@@ -75,28 +74,18 @@ void output_main(void* p) {
 }
 
 void play(uint8_t pattern[8][8]) {
-  uint8_t count = 0;
-  uint16_t i = 0, j = 0, wave = 0;
+    uint8_t count = 0;
+	for (uint16_t i = 0; i < COL_SIZE; i++) {
+        for (uint16_t j = 0; j < PIANO_SIZE*2; j++) { // size*2 to update L+R
 
-	for (; j < COL_SIZE;) {
-		if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
-            SPI_I2S_SendData(CODEC_I2S, wave);
-
-            // only update on every second sample to insure that L & R ch. have the same sample value
-            if (count & 1) {
-                if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
-                    wave = 0;
-                    for (uint8_t k = 0; k < COL_SIZE; k++) {
-                        wave += (piano[COL_SIZE-1-k][i]/8) * pattern[k][j];
-                    }
-                    i++;
-                } else {
-                    i = 0;
-                    j++;
-                }
-
+            uint16_t wave = 0;
+            for (uint8_t k = 0; k < COL_SIZE; k++) {
+                wave += (piano[k][j/2]/8) * pattern[k][i]; // j/2 to update L+R
             }
-            count++;
+
+            // wait for flag to clear then send
+            while (!SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {}
+            SPI_I2S_SendData(CODEC_I2S, wave);
         }
 	}
 }
