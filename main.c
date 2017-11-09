@@ -1,5 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 
 #include "ziki.h"
 
@@ -7,7 +8,7 @@
 #define CCM_RAM __attribute__((section(".ccmram")))
 
 #define INPUT_TASK_STACK_SIZE 1024
-#define OUTPUT_TASK_STACK_SIZE 8000
+#define OUTPUT_TASK_STACK_SIZE 14000
 
 StackType_t inputTaskStack[INPUT_TASK_STACK_SIZE] CCM_RAM;  // Put task stack in CCM
 StaticTask_t inputTaskBuffer CCM_RAM;  // Put TCB in CCM
@@ -23,7 +24,7 @@ int main(void) {
 
     Q_HANDLE_INPUT_OUTPUT = xQueueCreate(1, sizeof(uint16_t));
 
-    /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
+    HANDLE_INPUT = xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
 
     vTaskStartScheduler();  // should never return

@@ -1,6 +1,9 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
+#include <stdbool.h>
+#include <math.h>
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -17,14 +20,14 @@
 
 uint8_t CURSOR_COUNT = 0;
 
-uint32_t prev_Gnd[8] = {0}; //holds previous ground vals
+uint32_t prev_gnd[8] = {0}; //holds previous ground vals
 
-void play(uint8_t pattern[8][8]);
-void render(uint16_t pattern[9][8]);
+void play(uint8_t pattern[9][8]);
+void render(uint8_t pattern[9][8]);
 
 void box_animation();
 void intro_animation();
-void zeroIn_animation(uint8_t x, uint8_t y);
+void zeroin_animation(int8_t x, int8_t y);
 
 void setup_leds();
 void setup_sound();
@@ -33,28 +36,39 @@ void output_main(void* p) {
     setup_leds();
     setup_sound();
 
-    uint16_t selected[9][8] = {0};
-    uint16_t show[9][8] = {0};
+    uint8_t selected[9][8] = {
+        {0,0,0,0,0,0,0,0},
+        {1,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0},
+        {0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,1,0},
+        {0,0,0,0,0,0,0,1},
+    };
+    uint8_t show[9][8] = {0};
 
     uint16_t input_rcv;
-    uint8_t instrumentSel, tempo, playback, save, x, y = 0;
-    uint8_t prevSave;
+    uint8_t instrument_sel, tempo, playback, save;
+    int8_t x, y = 0;
+    uint8_t prev_save;
 
-    intro_animation();
+    /*intro_animation();*/
     while (1) {
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &input_rcv, 1);
-        instrumentSel = (input_rcv >> 9) & 1;
+        instrument_sel = (input_rcv >> 9) & 1;
         tempo = (input_rcv >> 8) & 1;
         playback = (input_rcv >> 7) & 1;
         save = (input_rcv >> 6) & 1;
         x = 7-(input_rcv >> 3);
         y = (0b111 & input_rcv)+1;
 
-        if(save == 1 && prevSave == 0){
+        if(save == 1 && prev_save == 0){
             selected[y+1][x] = 1 - selected[y+1][x];
             box_animation();
         }
-        prevSave = save;
+        prev_save = save;
 
         for (uint8_t i = 0; i < 9; i++) {
             for (uint8_t j = 0; j < 8; j++) {
@@ -62,22 +76,30 @@ void output_main(void* p) {
             }
         }
         show[y][x] = LED_CURSOR;
-        render(show);
 
-        if(instrumentSel == 1){
-              for(uint16_t i=0 ; i<500 ; i++){GPIOC->ODR = (0b111<<13);}
+        if (playback) {
+            vTaskSuspend(HANDLE_INPUT);
+            play(selected);
+            vTaskResume(HANDLE_INPUT);
+        } else {
+            render(show);
+        }
+
+
+        if(instrument_sel == 1){
+            for(uint16_t i=0 ; i<500 ; i++){GPIOC->ODR = (0b111<<13);}
         }
     }
 }
 
-void play(uint8_t pattern[8][8]) {
+void play(uint8_t pattern[9][8]) {
     uint8_t count = 0;
 	for (uint16_t i = 0; i < COL_SIZE; i++) {
         for (uint16_t j = 0; j < PIANO_SIZE*2; j++) { // size*2 to update L+R
 
             uint16_t wave = 0;
             for (uint8_t k = 0; k < COL_SIZE; k++) {
-                wave += (piano[k][j/2]/8) * pattern[k][i]; // j/2 to update L+R
+                wave += (piano[k][j/2]/8) * pattern[k+1][i]; // j/2 to update L+R
             }
 
             // wait for flag to clear then send
@@ -87,7 +109,7 @@ void play(uint8_t pattern[8][8]) {
 	}
 }
 
-void render(uint16_t pattern[9][8]) {
+void render(uint8_t pattern[9][8]) {
     //blink
     CURSOR_COUNT = (CURSOR_COUNT+1) % (LED_FREQ+1);
     for(uint8_t i = 0 ; i < 9 ; i++){
@@ -106,7 +128,7 @@ void render(uint16_t pattern[9][8]) {
         if ((7-i) == 4) {
             GPIOC->ODR = 1 << 3;
         }
-        GPIOE->ODR = prev_Gnd[i];
+        GPIOE->ODR = prev_gnd[i];
         for(uint16_t i=0; i<10000 ; i++){}
     }
 
@@ -119,7 +141,7 @@ void render(uint16_t pattern[9][8]) {
                 col_sum += (1 << (15-j));
             }
         }
-        prev_Gnd[i] = col_sum;
+        prev_gnd[i] = col_sum;
     }
 }
 
@@ -137,7 +159,7 @@ void intro_animation(){
     for(uint16_t i = 0 ; i < 10 ; i++){render(box1);}
     for(uint16_t i = 0 ; i < 50 ; i++){}
 
-    uint16_t sweep[9][8] = {0};
+    uint8_t sweep[9][8] = {0};
     uint8_t shift = 0;
     while(shift<32){
         for(uint8_t y=0 ; y<9 ; y++){
@@ -145,7 +167,7 @@ void intro_animation(){
                 sweep[y][x-shift] = pattern_ZIKI2[y][x];
             }
         }
-        for(uint16_t i = 0 ; i < 10 ; i++){render(sweep);}
+        for(uint8_t i = 0 ; i < 10 ; i++){render(sweep);}
         shift++;
     }
     for(uint16_t i = 0 ; i < 50 ; i++){}
@@ -155,8 +177,28 @@ void intro_animation(){
     for(uint16_t i = 0 ; i < 10 ; i++){render(box4);}
 }
 
-void zeroIn_animation(uint8_t x, uint8_t y){
-    
+bool in_range(int8_t x, int8_t y) {
+    return (x>0) && (y>0) && (x<=8) && (y<=9);
+}
+
+uint8_t dist(int8_t x, int8_t y, int8_t x2, int8_t y2) {
+    return (uint8_t) sqrt((x-x2)*(x-x2) + (y-y2)*(y-y2));
+}
+
+void zeroin_animation(int8_t x, int8_t y) {
+    uint8_t pattern[9][8] = {0};
+
+    for (int8_t x2 = 0; x2 < 8; x2++)  {
+        for (int8_t y2 = 0; y2 < 9; y2++) {
+        }
+    }
+    if (dist(3,3,4,4) == 1) {
+        pattern[5][5] = 1;
+    }
+
+    for (uint8_t i = 0; i < 10; i++) {
+        render(pattern);
+    }
 }
 
 void setup_leds() {
