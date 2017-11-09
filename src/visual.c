@@ -6,11 +6,15 @@
 
 #include "ziki.h"
 
+
 #define LED_OFF 0
 #define LED_ON 1
 #define LED_CURSOR 2
-#define LED_FREQ 6
+#define LED_FREQ 20
 
+uint8_t globalx = 0;
+uint8_t globaly = 0;
+uint8_t count = 0;
 uint32_t prev_Gnd[8] = {0,0,0,0,0,0,0,0}; //holds previous ground vals
 
 uint8_t CURSOR_COUNT = 0;
@@ -22,28 +26,38 @@ void configure_pins();
 void visual_main(void* p) {
     configure_pins();
 
-    uint8_t selected[9][8] = {{0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,1,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,1,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0}};
+    uint16_t selected[9][8] = {0};
+    uint16_t show[9][8] = {0};
 
-    uint8_t show[9][8] =     {{1,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0},
-                              {0,0,0,0,0,0,0,0}};
+    uint16_t coords;
+    int8_t x, y;
+    uint8_t save;
+
 
     while (1) {
-        render(selected);
+        xQueueReceive(Global_Queue_Handle, &coords, 1);
+        x = 7-(coords >> 3);
+        y = (0b111 & coords)+1;
+
+
+        save = (coords >> 6) & 1;
+        uint8_t pressed = selected[y+1][x];
+        if(save){
+            if (pressed) {
+                selected[y+1][x] = 0;
+            }
+            else{
+                selected[y+1][x] = 1;
+            }
+        }
+        //
+        for (uint8_t i = 0; i < 9; i++) {
+            for (uint8_t j = 0; j < 8; j++) {
+                show[i][j] = selected[i][j];
+            }
+        }
+        show[y][x] = LED_CURSOR;
+        render(show);
     }
 }
 
@@ -64,8 +78,18 @@ void configure_pins() {
 }
 
 void render(uint16_t pattern[9][8]) {
-    //multitplex
-    for(uint8_t i=0; i<8 ; i++){
+    //blink
+    CURSOR_COUNT = (CURSOR_COUNT+1) % (LED_FREQ+1);
+    for(uint8_t i = 0 ; i < 9 ; i++){
+          for(uint8_t j = 0 ; j < 8 ; j++ ){
+                if(pattern[i][j] == LED_CURSOR){
+                      pattern[i][j] = CURSOR_COUNT>(LED_FREQ/2);
+                }
+          }
+    }
+
+    //multiplex
+    for(uint16_t i=0; i<8 ; i++){
         GPIOA->ODR = 1<<(7-i);
         GPIOE->ODR = prev_Gnd[i];
         for(uint16_t i=0; i<10000 ; i++){}

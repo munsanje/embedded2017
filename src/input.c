@@ -42,8 +42,8 @@ void input_main(void* p) {
         x = Pot[0] >> 3; // focus on 3 MSb's of 6-bit ADC output
         y = Pot[1] >> 3;
 
-        input_snd = (instrumentSel<<9)+(tempo<<8)+(playback<<7)+(save<<6)+(x << 3) + y;
-        xQueueSend(Global_Queue_Handle, &input_snd, 2);
+        input_snd = (instrumentSel<<9)+(tempo<<8)+(playback<<7)+(save<<6)+(x << 3)+y;
+        xQueueSend(Global_Queue_Handle, &input_snd, 1);
     }
 
     vTaskDelete(NULL);
