@@ -16,9 +16,9 @@
 #define LED_CURSOR 2
 #define LED_FREQ 20
 
-uint32_t prev_Gnd[8] = {0,0,0,0,0,0,0,0}; //holds previous ground vals
-
 uint8_t CURSOR_COUNT = 0;
+
+uint32_t prev_Gnd[8] = {0}; //holds previous ground vals
 
 void play(uint8_t pattern[8][8]);
 void render(uint16_t pattern[9][8]);
@@ -39,6 +39,14 @@ void output_main(void* p) {
     int8_t x, y;
     uint8_t save;
     uint8_t prevSave;
+
+    uint8_t pattern[8][8] = {0};
+    for (uint8_t i = 0; i < 8; i++) {
+      pattern[i][i] = 1;
+    }
+    play(pattern);
+
+    setup_leds();
 
     while (1) {
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
@@ -92,12 +100,12 @@ void play(uint8_t pattern[8][8]) {
 void render(uint16_t pattern[9][8]) {
     //blink
     CURSOR_COUNT = (CURSOR_COUNT+1) % (LED_FREQ+1);
-    for (uint8_t i = 0 ; i < 9 ; i++){
-        for (uint8_t j = 0 ; j < 8 ; j++ ){
-            if(pattern[i][j] == LED_CURSOR){
-                pattern[i][j] = CURSOR_COUNT>(LED_FREQ/2);
-            }
-        }
+    for(uint8_t i = 0 ; i < 9 ; i++){
+          for(uint8_t j = 0 ; j < 8 ; j++ ){
+                if(pattern[i][j] == LED_CURSOR){
+                      pattern[i][j] = CURSOR_COUNT>(LED_FREQ/2);
+                }
+          }
     }
 
     //multiplex

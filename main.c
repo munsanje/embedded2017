@@ -18,7 +18,7 @@ StaticTask_t outputTaskBuffer CCM_RAM;  // Put TCB in CCM
 int main(void) {
     SystemInit();
 
-    Q_HANDLE_INPUT_OUTPUT = xQueueCreate(1, sizeof(uint8_t));
+    Q_HANDLE_INPUT_OUTPUT = xQueueCreate(1, sizeof(uint16_t));
 
     xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
