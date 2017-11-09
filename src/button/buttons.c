@@ -25,7 +25,7 @@ int8_t GPIOEXTI_IRQ[5] = {EXTI0_IRQn, EXTI1_IRQn, EXTI2_IRQn, EXTI3_IRQn, EXTI4_
  * 		Caller must simply declare GPIO_TypeDef* button_port; and pass it into this function as &button_port
  * @param button_pin: Reference to variable in which to store the pin number. As above, simply declare and pass
  * */
-void PBInit(const char* pin_name, GPIO_TypeDef** button_port, uint32_t* button_pin) {
+void PBInit(const char* pin_name, button_type* button) {
 	uint8_t letter = (uint8_t) pin_name[0] - (uint8_t) 'A';
 	uint8_t num = (uint8_t) pin_name[1] - (uint8_t) '0';
 
@@ -38,8 +38,8 @@ void PBInit(const char* pin_name, GPIO_TypeDef** button_port, uint32_t* button_p
 	uint8_t PB_EXTI_PIN_SOURCE = GPIOEXTI_Pin_Source[num];
 	int8_t PB_EXTI_IRQn = GPIOEXTI_IRQ[num];
 
-	*button_port = PB_PORT;
-	*button_pin = PB_PIN;
+	button->button_port = PB_PORT;
+	button->button_pin = PB_PIN;
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
@@ -79,8 +79,8 @@ void PBInit(const char* pin_name, GPIO_TypeDef** button_port, uint32_t* button_p
  * @param button_port: Reference to GPIO_TypeDef object initialized by call to PBInit, or other method
  * @param button_pin: Reference to variable containing number of pin
  * @return integer specifying value of push button*/
-uint32_t PBGetState(GPIO_TypeDef** button_port, uint32_t* button_pin) {
-  return GPIO_ReadInputDataBit(*button_port, *button_pin);
+uint32_t PBGetState(button_type* button) {
+	return GPIO_ReadInputDataBit(button->button_port, button->button_pin);
 }
 
 /*External Interrupt handler for line 0*/

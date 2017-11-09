@@ -17,9 +17,8 @@ static uint16_t buffer_size = 11025;
 
 void card_main(void* p) {
 
-	GPIO_TypeDef *button_port;
-	uint32_t button_pin;
-	PBInit("C0", &button_port, &button_pin);
+	button_type button;
+	PBInit("C0", &button);
 
 	static FATFS FatFs;
 	static FIL fp;
@@ -27,7 +26,7 @@ void card_main(void* p) {
 	const char* filename = "mA.wav";
   res = read_wav_file(&fp, filename, buffer, buffer_size);  // load in PCM data
 
-	while(PBGetState(&button_port, &button_pin) == 1);  // wait for button to be pressed
+	while(PBGetState(&button) == 1);  // wait for button to be pressed
 
 	if(res == FR_OK) {
 		playBuffer(buffer, buffer_size);
