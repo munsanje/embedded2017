@@ -56,7 +56,6 @@ SRC+=stm32f4_discovery.c
 
 # Buttons Source Files
 # SRC+=buttons.c
-SRC+=card.c
 
 # Project Source Files
 SRC+=stm32f4xx_it.c
