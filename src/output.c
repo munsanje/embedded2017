@@ -24,6 +24,7 @@ void play(uint8_t pattern[8][8]);
 void render(uint16_t pattern[9][8]);
 
 void box_animation();
+void intro_animation();
 
 void setup_leds();
 void setup_sound();
@@ -39,16 +40,17 @@ void output_main(void* p) {
     int8_t x, y;
     uint8_t save;
     uint8_t prevSave;
-
+/*
     uint8_t pattern[8][8] = {0};
     for (uint8_t i = 0; i < 8; i++) {
       pattern[i][i] = 1;
     }
     play(pattern);
-
-    setup_leds();
+*/
 
     while (1) {
+        //intro_animation();
+
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
         x = 7-(coords >> 3);
         y = (0b111 & coords)+1;
@@ -90,7 +92,6 @@ void play(uint8_t pattern[8][8]) {
                     i = 0;
                     j++;
                 }
-
             }
             count++;
         }
@@ -110,7 +111,11 @@ void render(uint16_t pattern[9][8]) {
 
     //multiplex
     for(uint16_t i=0; i<8 ; i++){
-        GPIOA->ODR = 1<<(7-i);
+        GPIOA->ODR = 1 << (7-i);
+        GPIOC->ODR &= 0b1111111111110111;
+        if ((7-i) == 4) {
+            GPIOC->ODR = 1 << 3;
+        }
         GPIOE->ODR = prev_Gnd[i];
         for(uint16_t i=0; i<10000 ; i++){}
     }
@@ -135,8 +140,23 @@ void box_animation(){
     for(uint16_t i = 0 ; i < 3 ; i++){render(box4);}
 }
 
+void intro_animation(){
+    uint16_t sweep[9][8] = {0};
+    uint8_t shift = 0;
+    while(shift<32){
+        //render words
+        for(uint8_t y=0 ; y<9 ; y++){
+            for(uint8_t x=shift ; x<(shift+8) ; x++){
+                sweep[y][x-shift] = pattern_ZIKI[y][x];
+            }
+        }
+        render(sweep);
+        shift++;
+    }
+}
+
 void setup_leds() {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOE, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOE, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
                                 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
@@ -149,6 +169,9 @@ void setup_leds() {
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10
                                 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOE, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
 void setup_sound() {
