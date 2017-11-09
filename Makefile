@@ -26,6 +26,7 @@ INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_gpio
 INCLUDE+=-I$(CURDIR)/lib/tm_stm32f4_spi
 INCLUDE+=-I$(CURDIR)/src
+INCLUDE+=-I$(CURDIR)/src/sound
 INCLUDE+=-I$(CURDIR)/src/card
 
 INCLUDE+=-I$(CURDIR)/src/button
@@ -40,12 +41,13 @@ BIN_DIR = $(CURDIR)/binary
 vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
           $(CURDIR)/src $(CURDIR)/src/card $(CURDIR)/hardware $(FREERTOS) \
           $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
-		  $(CURDIR)/lib/tm_stm32f4_delay $(CURDIR)/lib/tm_stm32f4_gpio \
-		  $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers \
-		  $(CURDIR)/lib/tm_stm32f4_fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option \
-		  $(CURDIR)/lib/tm_stm32f4_spi \
-			$(CURDIR)/lib/STM32F4-Discovery \
-			$(CURDIR)/src/card
+				  $(CURDIR)/lib/tm_stm32f4_delay $(CURDIR)/lib/tm_stm32f4_gpio \
+				  $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/drivers \
+				  $(CURDIR)/lib/tm_stm32f4_fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option \
+				  $(CURDIR)/lib/tm_stm32f4_spi \
+					$(CURDIR)/lib/STM32F4-Discovery \
+					$(CURDIR)/src/card \
+					$(CURDIR)/src/sound
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
@@ -56,6 +58,7 @@ SRC+=stm32f4_discovery.c
 
 # Buttons Source Files
 # SRC+=buttons.c
+SRC+=sound.c
 
 # Project Source Files
 SRC+=stm32f4xx_it.c
@@ -67,7 +70,6 @@ SRC+=card.c
 
 # Card Source files
 SRC+=codec.c
-# SRC+=sound.c
 SRC+=wav.c
 
 # FreeRTOS Source Files

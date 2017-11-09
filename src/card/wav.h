@@ -40,14 +40,16 @@ typedef struct WAVE_HEADER{
 
 
 // function prototypes
-FRESULT init_sd(FATFS *FatFs);
+// FRESULT init_sd(FATFS *FatFs);
+FRESULT init_sd();
 FRESULT deinit_sd();
 FRESULT open_file(FIL *fp, const TCHAR* filename, uint8_t flag);
 FRESULT read_header(FIL *fp, wave_header *header, uint32_t buffer_size, uint16_t *bytes_read);
 FRESULT read_file(FIL *fp, uint16_t *buffer, uint32_t buffer_size, uint16_t *bytes_read);
 FRESULT read_wav_header(FIL *fp, const TCHAR* filename, wave_header* header);
 FRESULT read_wav_data(FIL *fp, const TCHAR* filename, wave_header* header, uint16_t* buffer, uint32_t buffer_size);
-FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size);
+// FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size);
+FRESULT read_wav_file(const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size);
 FRESULT write_wav_file(FIL *fp, const TCHAR* filename, wave_header* header, uint16_t* wav_data);
 uint32_t get_wav_size(FIL *fp, const TCHAR* filename);
 /** Code to add:

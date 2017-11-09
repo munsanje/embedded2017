@@ -13,10 +13,14 @@
 static uint8_t mount_state = 0;  // 1 means successfully mounted card, 0 means unsuccessful
 uint16_t num_tries = 50;  // number of times filesystem operations should be retried before giving up
 
-FRESULT init_sd(FATFS *FatFs) {
+static FATFS FatFs;
+static FIL fp;
+
+// FRESULT init_sd(FATFS *FatFs) {
+FRESULT init_sd() {
 	FRESULT res = FR_OK;
 	if(mount_state == 0) {
-		FRESULT res = f_mount(FatFs, "", 1);
+		FRESULT res = f_mount(&FatFs, "", 1);
 		mount_state = res == FR_OK ? 1 : 0;
 	}
 	return res;
@@ -31,6 +35,7 @@ FRESULT deinit_sd() {
 	return res;
 }
 
+// FRESULT open_file(FIL *fp, const TCHAR* filename, uint8_t flag) {
 FRESULT open_file(FIL *fp, const TCHAR* filename, uint8_t flag) {
 	uint16_t i = 0;
 	FRESULT res;
@@ -142,15 +147,14 @@ uint32_t get_wav_size(FIL *fp, const TCHAR* filename) {
 
 /** Mount sd card and read wave file specified
  * @param filename name of file on sd card*/
-FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
+// FRESULT read_wav_file(FIL *fp, const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
+FRESULT read_wav_file(const TCHAR* filename, uint16_t* buffer, uint32_t buffer_size) {
 	// get header
+	init_sd(&FatFs);
 	wave_header header;
-	read_wav_header(fp, filename, &header);
-	for (uint16_t i = 0; i < buffer_size; i++) {
-        buffer[i] = 0; // zero out buffer
-    }
-	FRESULT res = read_wav_data(fp, filename, &header, buffer, buffer_size);
-
+	read_wav_header(&fp, filename, &header);
+	FRESULT res = read_wav_data(&fp, filename, &header, buffer, buffer_size);
+	deinit_sd();
 	return res;
 
 
