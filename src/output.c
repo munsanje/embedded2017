@@ -10,7 +10,6 @@
 #include "codec.h"
 #include "piano.h"
 
-
 #define LED_OFF 0
 #define LED_ON 1
 #define LED_CURSOR 2
@@ -25,11 +24,10 @@ void render(uint16_t pattern[9][8]);
 
 void box_animation();
 void intro_animation();
+void zeroIn_animation(uint8_t x, uint8_t y);
 
 void setup_leds();
 void setup_sound();
-
-
 
 void output_main(void* p) {
     setup_leds();
@@ -38,26 +36,27 @@ void output_main(void* p) {
     uint16_t selected[9][8] = {0};
     uint16_t show[9][8] = {0};
 
-    uint16_t coords;
-    int8_t x, y;
-    uint8_t save;
+    uint16_t input_rcv;
+    uint8_t instrumentSel, tempo, playback, save, x, y = 0;
     uint8_t prevSave;
-/*
+
+    /*
     uint8_t pattern[8][8] = {0};
     for (uint8_t i = 0; i < 8; i++) {
       pattern[i][i] = 1;
     }
     play(pattern);
-*/
-
+    */
     intro_animation();
     while (1) {
+        xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &input_rcv, 1);
+        instrumentSel = (input_rcv >> 9) & 1;
+        tempo = (input_rcv >> 8) & 1;
+        playback = (input_rcv >> 7) & 1;
+        save = (input_rcv >> 6) & 1;
+        x = 7-(input_rcv >> 3);
+        y = (0b111 & input_rcv)+1;
 
-        xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
-        x = 7-(coords >> 3);
-        y = (0b111 & coords)+1;
-
-        save = (coords >> 6) & 1;
         if(save == 1 && prevSave == 0){
             selected[y+1][x] = 1 - selected[y+1][x];
             box_animation();
@@ -71,6 +70,12 @@ void output_main(void* p) {
         }
         show[y][x] = LED_CURSOR;
         render(show);
+
+        if(instrumentSel == 1){
+              for(uint16_t i=0 ; i<500 ; i++){GPIOC->ODR = (0b111<<13);}
+        }
+
+
     }
 }
 
@@ -95,9 +100,9 @@ void play(uint8_t pattern[8][8]) {
                     j++;
                 }
             }
-            count++;
-        }
-	}
+         count++;
+      }
+	 }
 }
 
 void render(uint16_t pattern[9][8]) {
@@ -152,7 +157,6 @@ void intro_animation(){
     uint16_t sweep[9][8] = {0};
     uint8_t shift = 0;
     while(shift<32){
-        //render words
         for(uint8_t y=0 ; y<9 ; y++){
             for(uint8_t x=shift ; x<(shift+8) ; x++){
                 sweep[y][x-shift] = pattern_ZIKI2[y][x];
@@ -161,12 +165,15 @@ void intro_animation(){
         for(uint16_t i = 0 ; i < 10 ; i++){render(sweep);}
         shift++;
     }
-
     for(uint16_t i = 0 ; i < 50 ; i++){}
     for(uint16_t i = 0 ; i < 10 ; i++){render(box1);}
     for(uint16_t i = 0 ; i < 10 ; i++){render(box2);}
     for(uint16_t i = 0 ; i < 10 ; i++){render(box3);}
     for(uint16_t i = 0 ; i < 10 ; i++){render(box4);}
+}
+
+void zeroIn_animation(uint8_t x, uint8_t y){
+    
 }
 
 void setup_leds() {
@@ -184,7 +191,7 @@ void setup_leds() {
                                 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
