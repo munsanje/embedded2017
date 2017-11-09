@@ -60,7 +60,8 @@ void output_main(void* p) {
         /*}*/
         /*show[x][y] = LED_CURSOR;*/
 
-        /*render(selected);*/
+        play(selected);
+        render(selected);
     }
 
 }
@@ -92,9 +93,8 @@ void play(uint8_t pattern[8][8]) {
                 if ((i < PIANO_SIZE) && (j < COL_SIZE)) {
                     wave = 0;
                     for (uint8_t k = 0; k < COL_SIZE; k++) {
-                        wave += (piano[k][i]/8) * pattern[k][j];
+                        wave += (piano[COL_SIZE-1-k][i]/8) * pattern[k][j];
                     }
-
                     i++;
                 } else {
                     i = 0;
@@ -124,6 +124,7 @@ void setup_leds() {
                                 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
+
 void setup_sound() {
     GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
@@ -140,6 +141,4 @@ void setup_sound() {
 	codec_init();
 	codec_ctrl_init();
 	I2S_Cmd(CODEC_I2S, ENABLE);
-
-
 }
