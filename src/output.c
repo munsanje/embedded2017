@@ -47,7 +47,7 @@ void output_main(void* p) {
     }
     play(pattern);
 */
-
+    intro_animation();
     while (1) {
         intro_animation();
 
