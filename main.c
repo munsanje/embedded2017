@@ -20,7 +20,7 @@ int main(void) {
 
     Q_HANDLE_INPUT_OUTPUT = xQueueCreate(1, sizeof(uint8_t));
 
-    /*xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);*/
+    xTaskCreateStatic(input_main, "UserInput", INPUT_TASK_STACK_SIZE, NULL, 2, inputTaskStack, &inputTaskBuffer);
     xTaskCreateStatic(output_main, "Output", OUTPUT_TASK_STACK_SIZE, NULL, 1, outputTaskStack, &outputTaskBuffer);
 
     vTaskStartScheduler();  // should never return
