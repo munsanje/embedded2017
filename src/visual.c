@@ -17,6 +17,7 @@ uint8_t globaly = 0;
 uint8_t count = 0;
 uint32_t prev_Gnd[8] = {0,0,0,0,0,0,0,0}; //holds previous ground vals
 
+
 uint8_t CURSOR_COUNT = 0;
 
 void render(uint16_t pattern[9][8]);
@@ -32,25 +33,20 @@ void visual_main(void* p) {
     uint16_t coords;
     int8_t x, y;
     uint8_t save;
-
+    uint8_t prevSave;
 
     while (1) {
         xQueueReceive(Global_Queue_Handle, &coords, 1);
         x = 7-(coords >> 3);
         y = (0b111 & coords)+1;
 
-
         save = (coords >> 6) & 1;
         uint8_t pressed = selected[y+1][x];
-        if(save){
-            if (pressed) {
-                selected[y+1][x] = 0;
-            }
-            else{
-                selected[y+1][x] = 1;
-            }
+        if(save == 1 && prevSave == 0){
+            selected[y+1][x] = 1 - selected[y+1][x];
         }
-        //
+        prevSave = save;
+
         for (uint8_t i = 0; i < 9; i++) {
             for (uint8_t j = 0; j < 8; j++) {
                 show[i][j] = selected[i][j];
