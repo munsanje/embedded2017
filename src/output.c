@@ -49,7 +49,7 @@ void output_main(void* p) {
 */
 
     while (1) {
-        //intro_animation();
+        intro_animation();
 
         xQueueReceive(Q_HANDLE_INPUT_OUTPUT, &coords, 1);
         x = 7-(coords >> 3);
@@ -141,18 +141,30 @@ void box_animation(){
 }
 
 void intro_animation(){
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box4);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box3);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box2);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box1);}
+    for(uint16_t i = 0 ; i < 50 ; i++){}
+
     uint16_t sweep[9][8] = {0};
     uint8_t shift = 0;
     while(shift<32){
         //render words
         for(uint8_t y=0 ; y<9 ; y++){
             for(uint8_t x=shift ; x<(shift+8) ; x++){
-                sweep[y][x-shift] = pattern_ZIKI[y][x];
+                sweep[y][x-shift] = pattern_ZIKI2[y][x];
             }
         }
-        for(uint16_t i = 0 ; i < 3 ; i++){render(sweep);}
+        for(uint16_t i = 0 ; i < 10 ; i++){render(sweep);}
         shift++;
     }
+
+    for(uint16_t i = 0 ; i < 50 ; i++){}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box1);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box2);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box3);}
+    for(uint16_t i = 0 ; i < 10 ; i++){render(box4);}
 }
 
 void setup_leds() {
