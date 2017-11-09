@@ -45,7 +45,7 @@ vpath %.c $(CURDIR)/lib/STM32F4xx_StdPeriph_Driver/src \
 		  $(CURDIR)/lib/tm_stm32f4_fatfs $(CURDIR)/lib/tm_stm32f4_fatfs/fatfs/option \
 		  $(CURDIR)/lib/tm_stm32f4_spi \
 			$(CURDIR)/lib/STM32F4-Discovery \
-			$(CURDIR)/src/button
+			$(CURDIR)/src/card
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
@@ -55,7 +55,8 @@ SRC+=stm32f4_discovery_lis302dl.c
 SRC+=stm32f4_discovery.c
 
 # Buttons Source Files
-SRC+=buttons.c
+# SRC+=buttons.c
+SRC+=card.c
 
 # Project Source Files
 SRC+=stm32f4xx_it.c
@@ -67,7 +68,7 @@ SRC+=card.c
 
 # Card Source files
 SRC+=codec.c
-SRC+=sound.c
+# SRC+=sound.c
 SRC+=wav.c
 
 # FreeRTOS Source Files
