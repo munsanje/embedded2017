@@ -11,6 +11,7 @@
 #include "stm32f4xx.h"
 
 #include "buttons.h"
+#include "codec.h"
 
 #define button BUTTON_USER
 
@@ -44,6 +45,11 @@ void input_main(void* p) {
 
         input_snd = (instrumentSel<<9)+(tempo<<8)+(playback<<7)+(save<<6)+(x << 3)+y;
         xQueueSend(Q_HANDLE_INPUT_OUTPUT, &input_snd, 1);
+        
+        // audio clarity hack
+        if (SPI_I2S_GetFlagStatus(CODEC_I2S, SPI_I2S_FLAG_TXE)) {
+            SPI_I2S_SendData(CODEC_I2S, 0);
+        }
     }
 
     vTaskDelete(NULL);
