@@ -8,3 +8,4 @@
 *.cproject
 *.elf*
 button/Debug card/Debug
+binary/
