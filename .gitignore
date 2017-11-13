@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.TMP
 *.ini
 *.o
@@ -9,3 +10,18 @@
 *.elf*
 button/Debug card/Debug
 binary/
+=======
+# IDE / editors 
+.cproject
+.project
+.settings
+*.lvimrc
+*.swp
+
+# compiled files
+binary/*
+build/*
+
+
+!*.gitignore
+>>>>>>> leds
